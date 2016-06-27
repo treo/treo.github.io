@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>dubs.tech</title>
+    <description>An infrequently updated blog on tech that currently interests me.</description>
+    <link>/</link>
+    <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Mon, 27 Jun 2016 21:40:28 +0200</pubDate>
+    <lastBuildDate>Mon, 27 Jun 2016 21:40:28 +0200</lastBuildDate>
+    <generator>Jekyll v3.1.6</generator>
+    
+      <item>
+        <title>Hello World!</title>
+        <description>&lt;p&gt;Hello there,
+looks like you have found the very first post on this blog.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&quot;newthought&quot;&gt;If you see this post&lt;/span&gt;  consider yourself lucky, as it is going
+down as soon as the first actual post with content will go up.
+But before that can happen, the base has to work. So here we are,
+setting up the blog so content can flow freely into it.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 27 Jun 2016 14:26:07 +0200</pubDate>
+        <link>/articles/16/a-new-blog</link>
+        <guid isPermaLink="true">/articles/16/a-new-blog</guid>
+        
+        
+        <category>hello-world</category>
+        
+      </item>
+    
+  </channel>
+</rss>
