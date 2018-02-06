@@ -1,0 +1,739 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>Maven: Essentials &#8211; dubs·tech</title>
+<meta name="description" content="A quickstart guide for people that are required to use Maven right now.">
+<meta name="keywords" content="maven, guide">
+
+<!-- Twitter Cards -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@dot_treo">
+<meta name="twitter:creator" content="@dot_treo">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Maven: Essentials">
+<meta property="og:description" content="A quickstart guide for people that are required to use Maven right now.">
+<meta property="og:url" content="//dubs.tech/guides/maven-essentials/">
+<meta property="og:site_name" content="dubs·tech">
+<meta property="og:image" content="//dubs.tech/images/images/logo.png">
+
+<meta name="google-site-verification" content="n-ohWAcyARq2F3YAT0UtBa3gh0fluEoFMmHupOCXOvs">
+
+
+
+<link rel="canonical" href="//dubs.tech/guides/maven-essentials/">
+<link href="//dubs.tech/feed.xml" type="application/atom+xml" rel="alternate" title="dubs·tech Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="//dubs.tech/assets/css/main.css">
+<link rel="stylesheet" href="//dubs.tech/assets/css/jquery.mmenu.all.css">
+<link rel="stylesheet" href="//dubs.tech/assets/css/jquery.floating-social-share.min.css">
+<!-- Webfonts -->
+<link href="//fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic" rel="stylesheet" type="text/css">
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- Load Modernizr -->
+<script type="text/javascript" src="//dubs.tech/assets/js/vendor/modernizr-2.6.2.custom.min.js"></script>
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="//dubs.tech/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="//dubs.tech/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="//dubs.tech/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="//dubs.tech/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="//dubs.tech/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="//dubs.tech/images/apple-touch-icon-144x144-precomposed.png">
+
+
+
+
+</head>
+
+<body id="post" >
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+
+
+<div class="header-menu header-menu-top">
+    <ul class="header-item-container">
+      <li class="header-item-title header-toggle "><a href="#menu"><h2><i class="fa fa-bars"></i></h2></a></li>
+      <li class="header-item-title">
+        <a href="//dubs.tech/">
+          
+            <img class="logo" src="//dubs.tech/images/logo.png" alt="dubs·tech">
+          
+          <a href="//dubs.tech/" class="title"> dubs·tech</a>
+        </a>
+      </li>
+      
+        
+        
+
+        
+          <li class="header-item "><a href="//dubs.tech/categories"><h3>Categories</h3></a>
+            <ul class="header-submenu">
+              
+                
+                  <li class="sub-item"><a href="//dubs.tech/categories/#guides">guides</a></li>
+              
+            </ul>
+          </li>
+        
+      
+        
+        
+
+        
+            
+                <li class="header-item "><a href="//dubs.tech/tags"><h3>Tags</h3></a></li>
+            
+        
+      
+        
+        
+
+        
+            
+                <li class="header-item "><a href="//dubs.tech/"><h3>Home</h3></a></li>
+            
+        
+      
+      <li class="header-item"><a href="//dubs.tech/search"><h3><i class="fa fa-search"></i></h3></a></li>
+    </ul>
+  </div>
+<div class="entry-header">
+  <div class="header-title">
+    <div class="header-title-wrap">
+      <h1>Maven: Essentials</h1>
+      
+        <h2><span class="entry-date date published updated"><time datetime="2018-02-05T10:35:26+01:00">February 05, 2018</time></span></h2>
+      
+
+      
+        <p class="entry-reading-time">
+          <i class="fa fa-clock-o"></i>
+          
+          Reading time ~16 minutes
+        </p><!-- /.entry-reading-time -->
+      
+    </div><!-- /.header-title-wrap -->
+  </div><!-- /.header-title -->
+</div><!-- /.entry-header -->
+
+
+<nav id="menu" style="display: none">
+  <ul>
+    
+      
+        <li><a href="//dubs.tech/"><h3>Home</h3></a></li>
+      
+    
+      
+        <li><a href="//dubs.tech/tags"><h3>Tags</h3></a></li>
+      
+    
+      
+        <li><a href="//dubs.tech/categories"><h3>Categories</h3></a>
+          <ul>
+            
+              
+                <li><a href="//dubs.tech/categories/#guides">guides</a></li>
+            
+          </ul>
+        </li>
+      
+    
+  </ul>
+</nav>
+
+<div id="main" role="main">
+  <article class="hentry">
+    <div class="entry-content">
+        
+      <h1 class="post-title entry-title">Maven: Essentials</h1>
+      <p>This guide will explain the essentials you will need to get productive with Maven immediately. It is written with a complete beginner in mind. You should read this, if you don’t have any experience with Java package or dependency management beyond simply putting <code class="highlighter-rouge">.jar</code> files on your class path.</p>
+
+<p>You might have been looking to use a library, and just couldn’t find the <code class="highlighter-rouge">.jar</code> file for it, or you’ve been told to “just use Maven.” Maybe you just switched over to Java from a different programming language, and you want to know how dependency management works.</p>
+
+<!--more-->
+
+<p>Maven is the grand-daddy of most modern dependency management and build tools. Many modern programming languages can’t even become popular without a proper tool like it. So if you have ever used NPM with JavaScript, PIP with Python, or Bundler with Ruby, it will be pretty easy to understand what’s going on here.</p>
+
+<p>While there are several other tools that try to replace Maven, they still use the Maven package repository, and therefore it is still useful to get some experience with Maven under your belt before you decide to move on.</p>
+
+<p>As you may want to refer back to some parts of this guide, you can use the following table of contents to access any one of them quickly.</p>
+
+<ul id="markdown-toc">
+  <li><a href="#installing-maven" id="markdown-toc-installing-maven">Installing Maven</a>    <ul>
+      <li><a href="#ensuring-you-have-a-proper-jdk-version" id="markdown-toc-ensuring-you-have-a-proper-jdk-version">Ensuring you have a proper JDK version</a></li>
+      <li><a href="#downloading-and-extracting-maven" id="markdown-toc-downloading-and-extracting-maven">Downloading and extracting Maven</a></li>
+      <li><a href="#adding-maven-to-your-path" id="markdown-toc-adding-maven-to-your-path">Adding Maven to your PATH</a></li>
+    </ul>
+  </li>
+  <li><a href="#setting-up-a-project" id="markdown-toc-setting-up-a-project">Setting up a project</a>    <ul>
+      <li><a href="#updating-the-default-settings" id="markdown-toc-updating-the-default-settings">Updating the default settings</a></li>
+    </ul>
+  </li>
+  <li><a href="#adding-dependencies" id="markdown-toc-adding-dependencies">Adding dependencies</a>    <ul>
+      <li><a href="#finding-dependencies" id="markdown-toc-finding-dependencies">Finding dependencies</a></li>
+    </ul>
+  </li>
+  <li><a href="#packaging" id="markdown-toc-packaging">Packaging</a></li>
+  <li><a href="#scopes" id="markdown-toc-scopes">Scopes</a></li>
+  <li><a href="#troubleshooting" id="markdown-toc-troubleshooting">Troubleshooting</a></li>
+  <li><a href="#further-reading" id="markdown-toc-further-reading">Further reading</a></li>
+</ul>
+
+<h1 id="installing-maven">Installing Maven</h1>
+<p>Installing Maven can be a bit of a hassle. On Linux it is usually dead simple: Just install it from your package manager. However, if you are not on Linux, or you have to use a version that is not packaged, you will have to install it manually.</p>
+
+<p>The manual installation consists of just 3 steps:</p>
+
+<ol>
+  <li>Make sure you have a JDK installed (at least Java 7 for any modern version of Maven) and that the JAVA_HOME environment variable is properly set</li>
+  <li>Download and extract Maven to a convenient location</li>
+  <li>Add Mavens bin directory to your PATH environment variable</li>
+</ol>
+
+<p>The following explains each step in detail.</p>
+
+<h3 id="ensuring-you-have-a-proper-jdk-version">Ensuring you have a proper JDK version</h3>
+
+<p><em>For Windows:</em> Start a command prompt by running <code class="highlighter-rouge">cmd</code> (e.g. by pressing <code class="highlighter-rouge">WIN+R</code> and entering <code class="highlighter-rouge">cmd</code> in there).</p>
+
+<p><em>For Linux or macOS:</em> Open a terminal.</p>
+
+<p>Now enter <code class="highlighter-rouge">javac -version</code> to see which JDK version you have. You should be seeing something along the lines of the following, which tells you that you have a JDK for Java 8 at update version 151 installed:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>javac 1.8.0_151
+</code></pre></div></div>
+
+<p>If it says that the command was not found, then you have to properly <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">install a JDK first</a>. If you can run <code class="highlighter-rouge">java -version</code> but not <code class="highlighter-rouge">javac -version</code>, then you have probably installed a JRE instead, which still allows you to run Java applications, but will not allow you to compile Java programs. As you will be using Maven to compile your Java project, you have to install a JDK first.</p>
+
+<p>The <code class="highlighter-rouge">JAVA_HOME</code> environment variable can be checked from the command prompt / terminal as well.</p>
+
+<p><em>On Windows</em> enter:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>echo %JAVA_HOME%
+</code></pre></div></div>
+
+<p><em>On Linux or macOS</em> enter:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>echo $JAVA_HOME
+</code></pre></div></div>
+
+<p>You should see the path to your JDK installation as the result. If you don’t, but your JDK installation works as tested above, then you should set this environment variable properly using the same method as described in <a href="#adding-maven-to-your-path">Adding Maven to your PATH</a>.</p>
+
+<h3 id="downloading-and-extracting-maven">Downloading and extracting Maven</h3>
+<p>You can download Maven from its <a href="https://maven.apache.org/download.cgi">download site</a>, where you will be provided with links to the most recent release. Download the binary version, and extract it into a convenient location. It doesn’t matter if you choose the <code class="highlighter-rouge">.tar.gz</code> version or the <code class="highlighter-rouge">.zip</code> version, as their contents are identical — Windows user usually prefer <code class="highlighter-rouge">.zip</code> files, as they can be extracted without installing additional tools.</p>
+
+<p>What you consider a convenient location may differ depending on your needs. If you want to install it for just your user, then the home directory may be a good idea.</p>
+
+<h3 id="adding-maven-to-your-path">Adding Maven to your PATH</h3>
+
+<p>It isn’t strictly required to add Maven to your path. However, if you skip this step, you will always have to use the full path to your Maven installation, which makes using it pretty tedious.</p>
+
+<p>The method for adding Maven to your path depends on your operating system. The correct folder to be added to the PATH variable is the <code class="highlighter-rouge">bin</code> folder inside your Maven installation folder.</p>
+
+<p><em>Windows</em> users will have to go through the system control panel to do it. Use the search function to look for <em>environment variables</em> or directly open the dialog using <code class="highlighter-rouge">WIN+R</code> and enter <code class="highlighter-rouge">"C:\Windows\system32\rundll32.exe" sysdm.cpl,EditEnvironmentVariables</code>. On newer Windows versions you will get a list editor when editing the PATH variable, where you can easily add the proper path to the end. On older Windows versions, you will get just a line of text that you have to edit. In the latter case, you will have to add the path to Mavens bin folder prefixed with a semicolon, so the whole line looks something like this:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>C:\WINDOWS\System32;...;C:\Users\username\maven\bin
+</code></pre></div></div>
+
+<p>It doesn’t really matter what exactly is in front, as you can leave that alone. All you have to do is add on another entry.</p>
+
+<p><em>Linux and macOS</em> users, will have to add it in their <code class="highlighter-rouge">~/.profile</code> file (or <code class="highlighter-rouge">.bash_profile</code> or alternatively <code class="highlighter-rouge">.bashrc</code>). The line to do so should look something like this:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export PATH=$PATH:~/maven/bin
+</code></pre></div></div>
+
+<p>After changing your environment variables it is best to logout and login again or to restart the system in order to propagate the changes.</p>
+
+<p>To check that you have successfully installed Maven, run <code class="highlighter-rouge">mvn -v</code> in the command promt / terminal. It should tell you about the installed version of Maven as well as some information about your Java version. You should see something along the lines of the following. Your actual values will certainly vary, but as long as you get anything apart from an outright error message, you have probably installed Maven correctly.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Apache Maven 3.3.9 (bb52d8502b132ec0a5a3f4c09453c07478323dc5; 2015-11-10T17:41:47+01:00)
+Maven home: C:\Users\dubs\maven\bin\..
+Java version: 1.8.0_151, vendor: Oracle Corporation
+Java home: C:\Program Files\Java\jdk1.8.0_151\jre
+Default locale: de_DE, platform encoding: Cp1252
+OS name: "windows 10", version: "10.0", arch: "amd64", family: "dos"
+</code></pre></div></div>
+
+<p>Given that you have installed Maven correctly, let’s move on to using it.</p>
+
+<h1 id="setting-up-a-project">Setting up a project</h1>
+
+<p>Maven starts helping you out even before you have created your project. Aside from being a package management tool it is also a project generator, and there are a lot of different templates out there that you can use to create a new project. You are going to use the quickstart template now:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn archetype:generate -DarchetypeArtifactId=maven-archetype-quickstart 
+</code></pre></div></div>
+
+<p>Run this command in a directory where you want to create the new project. It will download the template called <code class="highlighter-rouge">maven-archetype-quickstart</code> and use it to create your project. Then it will ask you for your groupId, artifactId, initial version and package, and use the information to set up an initial project structure for you.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Define value for property 'groupId': : tech.dubs
+Define value for property 'artifactId': : example-project
+Define value for property 'version':  1.0-SNAPSHOT: :
+Define value for property 'package':  tech.dubs: : tech.dubs.example
+Confirm properties configuration:
+groupId: tech.dubs
+artifactId: example-project
+version: 1.0-SNAPSHOT
+package: tech.dubs.example
+ Y: : 
+</code></pre></div></div>
+
+<p>Between the colons you are provided with default values, which you can accept by pressing <code class="highlighter-rouge">enter</code>. To change the default value, you simply input your value before confirming with enter. In the example above, the default was accepted for the version property and a different value was chosen for the package property.</p>
+
+<p>The convention for groupId is to use a domain name that you control in the reverse notation, just as you would do it when defining your package name. The example uses <code class="highlighter-rouge">tech.dubs</code> here, as <code class="highlighter-rouge">dubs.tech</code> is a domain I control. If you don’t own a domain name, you might want to use <code class="highlighter-rouge">com.github.USERNAME</code> with your username, or something similar to that. The artifactId is the name of your project.</p>
+
+<p>With the values that are provided in the example, Maven will now create a new directory called <code class="highlighter-rouge">example-project</code>, it will contain a <code class="highlighter-rouge">pom.xml</code> file, as well as the necessary directory skeleton to get going. We will inspect the contents of the files it created shortly, but you may now want to import your newly created project into your favorite IDE. Both Eclipse and IntelliJ allow you to import Maven projects easily.</p>
+
+<p>When using your IDE, you can create projects using Maven directly and still use templates and the like.  However, this guide focuses on the handful of Maven commands that you should remember to be productive even without an IDE.</p>
+
+<h2 id="updating-the-default-settings">Updating the default settings</h2>
+
+<p>Let’s take a look at the files Maven created for you. The <code class="highlighter-rouge">src</code> directory contains both a <code class="highlighter-rouge">main</code> and a <code class="highlighter-rouge">test</code> directory. And both of them contain example code to get you started. Notice how the proper directory hierarchy for your packages has been created and you didn’t even have to think about it. The generated code is just a simple “Hello World”, which isn’t going to be inspected in more detail here.</p>
+
+<p>The <code class="highlighter-rouge">pom.xml</code> file is where Mavens configuration lives. It contains meta-information about your project, as well as configuration on how to build it, and what dependencies your project has.</p>
+
+<p>It should look like this:</p>
+
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>tech.dubs<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>example-project<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
+  <span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;name&gt;</span>example-project<span class="nt">&lt;/name&gt;</span>
+  <span class="nt">&lt;url&gt;</span>http://maven.apache.org<span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;dependencies&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>junit<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>junit<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>3.8.1<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+  <span class="nt">&lt;/dependencies&gt;</span>
+<span class="nt">&lt;/project&gt;</span></code></pre></figure>
+
+<p>As you can see, the properties that were set during project creation can be found here and a dependency is already defined. The original quickstart archetype, that you used to create the project, needs a bit of additional setup. The quickstart archetype doesn’t set some values, which results in Maven using Java 5 as the lowest common denomitor. Your project, however should probably use at least Java 8.</p>
+
+<p>Add the following inside the project tag.</p>
+
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml">  <span class="nt">&lt;build&gt;</span>
+    <span class="nt">&lt;plugins&gt;</span>
+      <span class="nt">&lt;plugin&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;version&gt;</span>3.1<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;configuration&gt;</span>
+          <span class="nt">&lt;source&gt;</span>1.8<span class="nt">&lt;/source&gt;</span>
+          <span class="nt">&lt;target&gt;</span>1.8<span class="nt">&lt;/target&gt;</span>
+        <span class="nt">&lt;/configuration&gt;</span>
+      <span class="nt">&lt;/plugin&gt;</span>
+    <span class="nt">&lt;/plugins&gt;</span>
+  <span class="nt">&lt;/build&gt;</span></code></pre></figure>
+
+<p>This will tell Maven that you want to use Java 8 features in your source code and also that you will be targeting a Java runtime environment that also supports Java 8 binaries. There may be cases where you want to use just the features of an older Java version, but still target a newer one, in which case you would set up the source and target tags differently.</p>
+
+<p>Let’s modernize it even further, and update the JUnit dependency to version 4.12, as that is the newest version at the time of writing. All you have to do, is to just update the value inside the version tag for the JUnit dependency to <code class="highlighter-rouge">4.12</code>. And Maven will pick up the change the next time you compile your project.</p>
+
+<p>Your pom.xml file should now look something like this:</p>
+
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>tech.dubs<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>example-project<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
+  <span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;name&gt;</span>example-project<span class="nt">&lt;/name&gt;</span>
+  <span class="nt">&lt;url&gt;</span>http://maven.apache.org<span class="nt">&lt;/url&gt;</span>
+
+
+  <span class="nt">&lt;dependencies&gt;</span>
+    <span class="nt">&lt;dependency&gt;</span>
+      <span class="nt">&lt;groupId&gt;</span>junit<span class="nt">&lt;/groupId&gt;</span>
+      <span class="nt">&lt;artifactId&gt;</span>junit<span class="nt">&lt;/artifactId&gt;</span>
+      <span class="nt">&lt;version&gt;</span>4.12<span class="nt">&lt;/version&gt;</span>
+      <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+    <span class="nt">&lt;/dependency&gt;</span>
+  <span class="nt">&lt;/dependencies&gt;</span>
+
+  <span class="nt">&lt;build&gt;</span>
+    <span class="nt">&lt;plugins&gt;</span>
+      <span class="nt">&lt;plugin&gt;</span>
+        <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+        <span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
+        <span class="nt">&lt;version&gt;</span>3.1<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;configuration&gt;</span>
+          <span class="nt">&lt;source&gt;</span>1.8<span class="nt">&lt;/source&gt;</span>
+          <span class="nt">&lt;target&gt;</span>1.8<span class="nt">&lt;/target&gt;</span>
+        <span class="nt">&lt;/configuration&gt;</span>
+      <span class="nt">&lt;/plugin&gt;</span>
+    <span class="nt">&lt;/plugins&gt;</span>
+  <span class="nt">&lt;/build&gt;</span>
+<span class="nt">&lt;/project&gt;</span></code></pre></figure>
+
+<h1 id="adding-dependencies">Adding dependencies</h1>
+
+<p>Now that you have setup your Maven project, let’s add some more dependencies to the project. You have already seen how to declare a simple dependency, with the automatically added JUnit. So for this example, a more complex dependency is used. Deeplearning4J is a large deep learning library, and most of the time you don’t need everything it has to offer. For this reason you have to add multiple dependencies to assemble what you need.</p>
+
+<p>Add the following inside the dependencies tag:</p>
+
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml">  <span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.deeplearning4j<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>deeplearning4j-core<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>0.9.1<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;/dependency&gt;</span>
+  <span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.datavec<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>datavec-api<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>0.9.1<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;/dependency&gt;</span>
+  <span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.nd4j<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>nd4j-native-platform<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>0.9.1<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;/dependency&gt;</span></code></pre></figure>
+
+<p>Now you can use Deeplearning4J on your CPU in your project, and utilize its datavec API to load data for it. However, that isn’t the reason why it is the chosen example. When assembling the single modules of Deeplearning4J, you have to ensure that they are all using the same version, or you may get hard to debug problems. So, if you want to update it, you will have to change all versions at the same time. As that can be a bit tricky once you have a lot of dependencies and it would open up the possibility that you overlook one of them, there is also a better way to do this.</p>
+
+<p>Define a property that you can use as a variable instead. Add the following inside your project tag:</p>
+
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml">  <span class="nt">&lt;properties&gt;</span>
+    <span class="nt">&lt;dl4j.version&gt;</span>0.9.1<span class="nt">&lt;/dl4j.version&gt;</span>
+  <span class="nt">&lt;/properties&gt;</span></code></pre></figure>
+
+<p>Using the <code class="highlighter-rouge">dl4j.version</code> tag you can now define that the Deeplearning4J version that you want to use is <code class="highlighter-rouge">0.9.1</code>. But, you still have to actually change the versions inside the dependencies, or it will have no effect. In order to do so, update the version tag of your new dependencies to <code class="highlighter-rouge">${dl4j.version}</code>. This will insert the value that you defined using the <code class="highlighter-rouge">dl4j.version</code> tag.</p>
+
+<p>There is nothing special about the <code class="highlighter-rouge">dl4j.version</code> tag, you might have called it <code class="highlighter-rouge">foo.bar.baz</code> instead, and used <code class="highlighter-rouge">${foo.bar.baz}</code> to mark the places where you want its value inserted. You can use pretty much every name that you can think of here, however, some are already taken. So you should steer clear of using the <code class="highlighter-rouge">pom</code>, <code class="highlighter-rouge">settings</code>, <code class="highlighter-rouge">scm</code>, <code class="highlighter-rouge">parent</code> and <code class="highlighter-rouge">project</code> prefixes as well as the properties that define the project itself (i.e. <code class="highlighter-rouge">name</code>, <code class="highlighter-rouge">groupId</code>, <code class="highlighter-rouge">artifactId</code>, <code class="highlighter-rouge">version</code>, etc…).</p>
+
+<p>Now that you’ve done that, your pom.xml should look something like this:</p>
+
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+         <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>tech.dubs<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>example-project<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;name&gt;</span>example-project<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;url&gt;</span>http://maven.apache.org<span class="nt">&lt;/url&gt;</span>
+
+    <span class="nt">&lt;properties&gt;</span>
+        <span class="nt">&lt;dl4j.version&gt;</span>0.9.1<span class="nt">&lt;/dl4j.version&gt;</span>
+    <span class="nt">&lt;/properties&gt;</span>
+
+    <span class="nt">&lt;dependencies&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>junit<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>junit<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>4.12<span class="nt">&lt;/version&gt;</span>
+            <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.deeplearning4j<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>deeplearning4j-core<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>${dl4j.version}<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.datavec<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>datavec-api<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>${dl4j.version}<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.nd4j<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>nd4j-native-platform<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>${dl4j.version}<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+    <span class="nt">&lt;/dependencies&gt;</span>
+
+    <span class="nt">&lt;build&gt;</span>
+        <span class="nt">&lt;plugins&gt;</span>
+            <span class="nt">&lt;plugin&gt;</span>
+                <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+                <span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
+                <span class="nt">&lt;version&gt;</span>3.1<span class="nt">&lt;/version&gt;</span>
+                <span class="nt">&lt;configuration&gt;</span>
+                    <span class="nt">&lt;source&gt;</span>1.8<span class="nt">&lt;/source&gt;</span>
+                    <span class="nt">&lt;target&gt;</span>1.8<span class="nt">&lt;/target&gt;</span>
+                <span class="nt">&lt;/configuration&gt;</span>
+            <span class="nt">&lt;/plugin&gt;</span>
+        <span class="nt">&lt;/plugins&gt;</span>
+    <span class="nt">&lt;/build&gt;</span>
+<span class="nt">&lt;/project&gt;</span></code></pre></figure>
+
+<h2 id="finding-dependencies">Finding dependencies</h2>
+
+<p>Most projects will tell you how to include them as a dependency in their documentation. However, maybe the one project you are looking for doesn’t do that. In that case you might want to visit <a href="https://search.maven.org">https://search.maven.org</a> where you can search through all projects that are available on the central Maven repository.</p>
+
+<p>Simply enter the project name and see what comes up. By clicking on the version it will take you to a page which tells you how exactly the dependency declaration for this project at this version should look like.</p>
+
+<h1 id="packaging">Packaging</h1>
+
+<p>Maven is a build tool after all, so let’s build something. Using <code class="highlighter-rouge">mvn package</code> it will run your tests and then build your application. The resulting jar file will be placed inside the <code class="highlighter-rouge">target</code> directory.</p>
+
+<p>If your project is a library, you can also run <code class="highlighter-rouge">mvn install</code> to directly install it in your local Maven repository. This allows you to use it as a dependency in other projects on your local computer. All of its dependencies will then be transitively loaded when you add it to your project, so you don’t have to add them manually.</p>
+
+<p>However, your project probably is an application, and you want to create just a single jar file, which you can deploy somewhere or share with your friends, and they shouldn’t have to deal with Maven or any other build tool. In that case, you want to create something called an uberjar. An uberjar contains not only your application, but also all its dependencies and their dependencies. That way you can easily create a single jar file that requires nothing beside a Java runtime installation.</p>
+
+<p>In order to create an uberjar simply add the <code class="highlighter-rouge">maven-shade-plugin</code> to your <code class="highlighter-rouge">pom.xml</code> file as another plugin inside the <code class="highlighter-rouge">plugins</code> tag:</p>
+
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="nt">&lt;plugin&gt;</span>
+  <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+  <span class="nt">&lt;artifactId&gt;</span>maven-shade-plugin<span class="nt">&lt;/artifactId&gt;</span>
+  <span class="nt">&lt;version&gt;</span>3.1.0<span class="nt">&lt;/version&gt;</span>
+  <span class="nt">&lt;executions&gt;</span>
+    <span class="nt">&lt;execution&gt;</span>
+      <span class="nt">&lt;phase&gt;</span>package<span class="nt">&lt;/phase&gt;</span>
+      <span class="nt">&lt;goals&gt;</span>
+        <span class="nt">&lt;goal&gt;</span>shade<span class="nt">&lt;/goal&gt;</span>
+      <span class="nt">&lt;/goals&gt;</span>
+      <span class="nt">&lt;configuration&gt;</span>
+        <span class="nt">&lt;transformers&gt;</span>
+          <span class="nt">&lt;transformer</span> <span class="na">implementation=</span><span class="s">"org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;mainClass&gt;</span>tech.dubs.example.App<span class="nt">&lt;/mainClass&gt;</span>
+          <span class="nt">&lt;/transformer&gt;</span>
+        <span class="nt">&lt;/transformers&gt;</span>
+      <span class="nt">&lt;/configuration&gt;</span>
+    <span class="nt">&lt;/execution&gt;</span>
+  <span class="nt">&lt;/executions&gt;</span>
+<span class="nt">&lt;/plugin&gt;</span></code></pre></figure>
+
+<p>Notice that we define which <code class="highlighter-rouge">mainClass</code> to use in the case that the application is started without explicitly chosing an entry point. For example from the command line with:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java -jar filename.jar
+</code></pre></div></div>
+
+<p>If that wasn’t defined, it would be necessary to add the class you want to start at the command line like:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java -jar filename.jar tech.dubs.example.App
+</code></pre></div></div>
+
+<p>That also means that on many systems — given that Java is already installed — the application can be started by simply double clicking the jar file.</p>
+
+<p>With the plugin, you still package your application by running</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn package
+</code></pre></div></div>
+
+<p>But, you will now find two jar files in the <code class="highlighter-rouge">target</code> directory. One will have an <code class="highlighter-rouge">original-</code> prefix. That is the jar file that does not include any dependencies. The other one is your uberjar, and contains everything needed to run it. Another way to distinguish those two files, is that the uberjar will always be larger than the original as it contains all dependencies after all.</p>
+
+<p>You can try running it from the root of your project. And you should see the output:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; java -jar target/example-project-1.0-SNAPSHOT.jar
+Hello World!
+</code></pre></div></div>
+
+<p>At this point your whole <code class="highlighter-rouge">pom.xml</code> file should look like this:</p>
+
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="nt">&lt;project</span> <span class="na">xmlns=</span><span class="s">"http://maven.apache.org/POM/4.0.0"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+         <span class="na">xsi:schemaLocation=</span><span class="s">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;modelVersion&gt;</span>4.0.0<span class="nt">&lt;/modelVersion&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>tech.dubs<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>example-project<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;packaging&gt;</span>jar<span class="nt">&lt;/packaging&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0-SNAPSHOT<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;name&gt;</span>example-project<span class="nt">&lt;/name&gt;</span>
+    <span class="nt">&lt;url&gt;</span>http://maven.apache.org<span class="nt">&lt;/url&gt;</span>
+
+    <span class="nt">&lt;properties&gt;</span>
+        <span class="nt">&lt;dl4j.version&gt;</span>0.9.1<span class="nt">&lt;/dl4j.version&gt;</span>
+    <span class="nt">&lt;/properties&gt;</span>
+
+    <span class="nt">&lt;dependencies&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>junit<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>junit<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>4.12<span class="nt">&lt;/version&gt;</span>
+            <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.deeplearning4j<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>deeplearning4j-core<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>${dl4j.version}<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.datavec<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>datavec-api<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>${dl4j.version}<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+        <span class="nt">&lt;dependency&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.nd4j<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>nd4j-native-platform<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;version&gt;</span>${dl4j.version}<span class="nt">&lt;/version&gt;</span>
+        <span class="nt">&lt;/dependency&gt;</span>
+    <span class="nt">&lt;/dependencies&gt;</span>
+
+    <span class="nt">&lt;build&gt;</span>
+        <span class="nt">&lt;plugins&gt;</span>
+            <span class="nt">&lt;plugin&gt;</span>
+                <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+                <span class="nt">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="nt">&lt;/artifactId&gt;</span>
+                <span class="nt">&lt;version&gt;</span>3.1<span class="nt">&lt;/version&gt;</span>
+                <span class="nt">&lt;configuration&gt;</span>
+                    <span class="nt">&lt;source&gt;</span>1.8<span class="nt">&lt;/source&gt;</span>
+                    <span class="nt">&lt;target&gt;</span>1.8<span class="nt">&lt;/target&gt;</span>
+                <span class="nt">&lt;/configuration&gt;</span>
+            <span class="nt">&lt;/plugin&gt;</span>
+            <span class="nt">&lt;plugin&gt;</span>
+              <span class="nt">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="nt">&lt;/groupId&gt;</span>
+              <span class="nt">&lt;artifactId&gt;</span>maven-shade-plugin<span class="nt">&lt;/artifactId&gt;</span>
+              <span class="nt">&lt;version&gt;</span>3.1.0<span class="nt">&lt;/version&gt;</span>
+              <span class="nt">&lt;executions&gt;</span>
+                <span class="nt">&lt;execution&gt;</span>
+                  <span class="nt">&lt;phase&gt;</span>package<span class="nt">&lt;/phase&gt;</span>
+                  <span class="nt">&lt;goals&gt;</span>
+                    <span class="nt">&lt;goal&gt;</span>shade<span class="nt">&lt;/goal&gt;</span>
+                  <span class="nt">&lt;/goals&gt;</span>
+                  <span class="nt">&lt;configuration&gt;</span>
+                    <span class="nt">&lt;transformers&gt;</span>
+                      <span class="nt">&lt;transformer</span> <span class="na">implementation=</span><span class="s">"org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"</span><span class="nt">&gt;</span>
+                        <span class="nt">&lt;mainClass&gt;</span>tech.dubs.example.App<span class="nt">&lt;/mainClass&gt;</span>
+                      <span class="nt">&lt;/transformer&gt;</span>
+                    <span class="nt">&lt;/transformers&gt;</span>
+                  <span class="nt">&lt;/configuration&gt;</span>
+                <span class="nt">&lt;/execution&gt;</span>
+              <span class="nt">&lt;/executions&gt;</span>
+            <span class="nt">&lt;/plugin&gt;</span>
+        <span class="nt">&lt;/plugins&gt;</span>
+    <span class="nt">&lt;/build&gt;</span>
+<span class="nt">&lt;/project&gt;</span></code></pre></figure>
+
+<h1 id="scopes">Scopes</h1>
+
+<p>You may have noticed that the JUnit dependency doesn’t quite look like the others that you have manually added:</p>
+
+<figure class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>junit<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>junit<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;version&gt;</span>4.12<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre></figure>
+
+<p>It contains a <code class="highlighter-rouge">scope</code> tag. The scope tag is used to specify under which conditions a dependency is required. In most cases you don’t want dependencies that you only need for testing (like JUnit) to be included in your project when you are running it. For this reason you can set the scope to one of <code class="highlighter-rouge">compile, provided, runtime, test, system</code>. Only compile, provided and test are detailed here, but if you want to know more about them take a look at the <a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html#Dependency_Scope">Dependency Scope section in the Maven manual</a>.</p>
+
+<p>The <code class="highlighter-rouge">compile</code> scope is the default scope if you don’t provide one. It means that the dependency is needed to compile and run your application.</p>
+
+<p>The <code class="highlighter-rouge">provided</code> scope is very much like the compile scope, however, you tell Maven that this dependency will be provided by either the JDK or your application container on runtime. This is usually something that is set on dependencies like Java EE APIs.</p>
+
+<p>The <code class="highlighter-rouge">test</code> scope makes a dependency only available when compiling and running tests. This means, that you will not be able to compile non-test code, which tries to use a test scoped dependency, nor will you be able to run it.</p>
+
+<h1 id="troubleshooting">Troubleshooting</h1>
+<p>A common problem is that something about a defined dependency just isn’t quite right, and you just can’t figure out why.</p>
+
+<p>The command <code class="highlighter-rouge">mvn dependency:tree</code> will output your whole dependency tree along with all of its transitive dependencies. By working through it, it is often easily possible to spot what the problem is.</p>
+
+<h1 class="no_toc" id="one-last-thing">One last thing</h1>
+<p>Maven has a lot of useful plugins, some of which can be directly called and that are then downloaded automatically. For example you might want to take a look at what security problems your dependencies may result in by running</p>
+
+<p><code class="highlighter-rouge">mvn org.owasp:dependency-check-maven:check</code></p>
+
+<p>It will download everything that it requires to do the job, and then run without you even having to modify your pom.xml.</p>
+
+<h1 id="further-reading">Further reading</h1>
+
+<p>Now you know everything that is even remotely required to get started with Maven. But maybe you want to dig deeper and learn even more. If you are fine with reading on a screen, you can find a lot more information on the <a href="https://maven.apache.org/guides/index.html">maven homepage</a>, if you prefer a book <a href="https://www.amazon.com/Maven-Definitive-Guide-Sonatype-Company/dp/0596517335">Maven: The Definitive Guide</a> may be better suited for you.</p>
+
+      <footer class="entry-meta">
+        <span class="entry-tags"><a href="//dubs.tech/tags#maven" title="Pages tagged maven" class="tag"><span class="term">maven</span></a><a href="//dubs.tech/tags#guide" title="Pages tagged guide" class="tag"><span class="term">guide</span></a></span>
+        
+        <span class="author vcard"><span class="fn">Paul Dubs</span></span>
+        <div class="social-share">
+  <ul class="socialcount socialcount-small inline-list">
+    <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=//dubs.tech/guides/maven-essentials/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+    <li class="twitter"><a href="https://twitter.com/intent/tweet?text=//dubs.tech/guides/maven-essentials/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+    <li class="googleplus"><a href="https://plus.google.com/share?url=//dubs.tech/guides/maven-essentials/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+  </ul>
+</div><!-- /.social-share -->
+
+      </footer>
+    </div><!-- /.entry-content -->
+    <div class="read-more">
+  <div class="read-more-header">
+    <a href="/about" class="read-more-btn">About the Author</a>
+  </div><!-- /.read-more-header -->
+  <div class="read-more-content author-info">
+    <h3>Paul Dubs</h3>
+    <div class="author-container">
+      <img class="author-img" src="//dubs.tech/images/avatar.jpg" alt="Paul Dubs" />
+      <div class="author-bio">Professional software developer for over 12 years. Passionate about creating maintainable solutions and helping people to learn.</div>
+    </div>
+    <div class="author-share">
+      <ul class="list-inline social-buttons">
+        
+          <li><a href="https://github.com/treo" target="_blank"><i class="fa fa-github fa-fw"></i></a></li>
+        
+          <li><a href="https://www.linkedin.com/in/paul-dubs" target="_blank"><i class="fa fa-linkedin fa-fw"></i></a></li>
+        
+      </ul>
+      
+        <a aria-label="Follow @treo on GitHub" data-style="mega" href="https://github.com/treo" class="github-button">Follow @treo</a>
+      
+      <br>
+      
+        <a href="https://twitter.com/dot_treo" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @dot_treo</a>
+      
+    </div>
+  </div>
+</div>
+
+    
+    
+  </article>
+</div><!-- /#main -->
+
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">window.jQuery || document.write('<script type="text/javascript" src="//dubs.tech/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script type="text/javascript" src="//dubs.tech/assets/js/scripts.min.js"></script>
+<script type="text/javascript" async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
+<script type="text/javascript">!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+
+
+<!-- Asynchronous Google Analytics snippet -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2996078-30', 'auto');
+  ga('require', 'linkid', 'linkid.js');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+
+<div class="footer-wrapper">
+  <footer role="contentinfo">
+    <span>&copy; 2018 Paul Dubs.</span>
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+</body>
+</html>

@@ -1,32 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>dubs.tech</title>
-    <description>An infrequently updated blog on tech that currently interests me.</description>
-    <link>/</link>
-    <atom:link href="/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 28 Jun 2016 09:06:22 +0200</pubDate>
-    <lastBuildDate>Tue, 28 Jun 2016 09:06:22 +0200</lastBuildDate>
-    <generator>Jekyll v3.1.6</generator>
-    
-      <item>
-        <title>Hello World!</title>
-        <description>&lt;p&gt;Hello there,
-looks like you have found the very first post on this blog.&lt;/p&gt;
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+<title type="text">dubs·tech</title>
+<generator uri="https://github.com/mojombo/jekyll">Jekyll</generator>
+<link rel="self" type="application/atom+xml" href="//dubs.tech/feed.xml" />
+<link rel="alternate" type="text/html" href="//dubs.tech" />
+<updated>2018-02-06T09:52:04+01:00</updated>
+<id>//dubs.tech/</id>
+<author>
+  <name>Paul Dubs</name>
+  <uri>//dubs.tech/</uri>
+  <email>paul.dubs@gmail.com</email>
+</author>
 
-&lt;p&gt;&lt;span class=&quot;newthought&quot;&gt;If you see this post&lt;/span&gt;  consider yourself lucky, as it is going
-down as soon as the first actual post with content will go up.
-But before that can happen, the base has to work. So here we are,
-setting up the blog so content can flow freely into it.&lt;/p&gt;
-</description>
-        <pubDate>Mon, 27 Jun 2016 14:26:07 +0200</pubDate>
-        <link>/articles/16/a-new-blog</link>
-        <guid isPermaLink="true">/articles/16/a-new-blog</guid>
-        
-        
-        <category>hello-world</category>
-        
-      </item>
-    
-  </channel>
-</rss>
+
+<entry>
+  <title type="html"><![CDATA[Maven: Essentials]]></title>
+ <link rel="alternate" type="text/html" href="//dubs.tech/guides/maven-essentials/" />
+  <id>//dubs.tech/guides/maven-essentials</id>
+  <published>2018-02-05T10:35:26+01:00</published>
+  <updated>2018-02-05T10:35:26+01:00</updated>
+  <author>
+    <name>Paul Dubs</name>
+    <uri>//dubs.tech</uri>
+    <email>paul.dubs@gmail.com</email>
+  </author>
+  <content type="html">
+    &lt;p&gt;This guide will explain the essentials you will need to get productive with Maven immediately. It is written with a complete beginner in mind. You should read this, if you don’t have any experience with Java package or dependency management beyond simply putting &lt;code class=&quot;highlighter-rouge&quot;&gt;.jar&lt;/code&gt; files on your class path.&lt;/p&gt;
+
+&lt;p&gt;You might have been looking to use a library, and just couldn’t find the &lt;code class=&quot;highlighter-rouge&quot;&gt;.jar&lt;/code&gt; file for it, or you’ve been told to “just use Maven.” Maybe you just switched over to Java from a different programming language, and you want to know how dependency management works.&lt;/p&gt;
+
+
+    &lt;p&gt;&lt;a href=&quot;//dubs.tech/guides/maven-essentials/&quot;&gt;Maven: Essentials&lt;/a&gt; was originally published by Paul Dubs at &lt;a href=&quot;//dubs.tech&quot;&gt;dubs·tech&lt;/a&gt; on February 05, 2018.&lt;/p&gt;
+  </content>
+</entry>
+
+</feed>

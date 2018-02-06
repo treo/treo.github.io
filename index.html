@@ -1,102 +1,237 @@
-<!DOCTYPE html>
-<html>
-  <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>dubs.tech blog - mostly on technology &#8211; dubs·tech</title>
+<meta name="description" content="dubs.tech blog - mostly on technology">
+<meta name="keywords" content="java, kotlin, deeplearning">
 
-  <title>blog</title>
-  <meta name="description" content="An infrequently updated blog on tech that currently interests me.">
+<!-- Twitter Cards -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@dot_treo">
+<meta name="twitter:creator" content="@dot_treo">
 
-  <!-- Google Fonts loaded here depending on setting in _data/options.yml true loads font, blank does not-->
-  
-    <link href='//fonts.googleapis.com/css?family=Lato:400,400italic' rel='stylesheet' type='text/css'>
-  
-  
-  <!-- Load up MathJax script if needed ... specify in /_data/options.yml file-->
-  
-    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-  
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="dubs.tech blog - mostly on technology">
+<meta property="og:description" content="dubs.tech blog - mostly on technology">
+<meta property="og:url" content="//dubs.tech/">
+<meta property="og:site_name" content="dubs·tech">
+<meta property="og:image" content="//dubs.tech/images/images/logo.png">
 
-  <link rel="stylesheet" type="text/css" href="/css/tufte.css">
-  <!-- <link rel="stylesheet" type="text/css" href="/css/print.css" media="print"> -->
+<meta name="google-site-verification" content="n-ohWAcyARq2F3YAT0UtBa3gh0fluEoFMmHupOCXOvs">
 
-  <link rel="canonical" href="/">
 
-  <link rel="alternate" type="application/rss+xml" title="dubs.tech" href="/feed.xml" />
+
+<link rel="canonical" href="//dubs.tech/">
+<link href="//dubs.tech/feed.xml" type="application/atom+xml" rel="alternate" title="dubs·tech Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="//dubs.tech/assets/css/main.css">
+<link rel="stylesheet" href="//dubs.tech/assets/css/jquery.mmenu.all.css">
+<link rel="stylesheet" href="//dubs.tech/assets/css/jquery.floating-social-share.min.css">
+<!-- Webfonts -->
+<link href="//fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic" rel="stylesheet" type="text/css">
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- Load Modernizr -->
+<script type="text/javascript" src="//dubs.tech/assets/js/vendor/modernizr-2.6.2.custom.min.js"></script>
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="//dubs.tech/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="//dubs.tech/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="//dubs.tech/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="//dubs.tech/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="//dubs.tech/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="//dubs.tech/images/apple-touch-icon-144x144-precomposed.png">
+
+
+
+
 </head>
 
-  <body class="full-width">
-    <!--- Header and nav template site-wide -->
-<header>
-    <nav class="group">
-	<a href="/"><img class="badge" src="/assets/img/logo.png" alt="CH"></a>
-	
-		
-  	
-		
-		    
-		      <a class="active" href="/" class="active">blog</a>
-		    
-	    
-  	
-		
-		    
-		      <a href="/about/">About</a>
-		    
-	    
-  	
-		
-		    
-		      <a href="/css/print.css"></a>
-		    
-	    
-  	
-		
-  	
-	</nav>
-</header>
-    <article>
-        <h1 class="content-listing-header sans">Articles</h1>
-  <ul class="content-listing ">
-          
-        <li class="listing">
-          <hr class="slender">
-          <a href="/articles/16/a-new-blog"><h3 class="contrast">Hello World!</h3></a>
-          <br><span class="smaller">June 27, 2016</span>  <br/>
-          <div><p>Hello there,
-looks like you have found the very first post on this blog.</p>
+<body id="post-index">
 
-<p><span class="newthought">If you see this post</span>  consider yourself lucky, as it is going
-down as soon as the first actual post with content will go up.
-But before that can happen, the base has to work. So here we are,
-setting up the blog so content can flow freely into it.</p>
-</div> 
-        </li>
-    
-  </ul>
-    </article>
-    <span class="print-footer">blog - Paul Dubs</span>
-    <footer>
-  <hr class="slender">
-  <ul class="footer-links">
-    
-      <li>
-        <a href="//www.twitter.com/dot_treo"><span class="icon-twitter"></span></a>
-      </li>
-    
-      <li>
-        <a href="//github.com/treo"><span class="icon-github"></span></a>
-      </li>
-    
-      <li>
-        <a href="/feed.xml"><span class="icon-feed"></span></a>
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+
+
+<div class="header-menu header-menu-top">
+    <ul class="header-item-container">
+      <li class="header-item-title header-toggle "><a href="#menu"><h2><i class="fa fa-bars"></i></h2></a></li>
+      <li class="header-item-title">
+        <a href="//dubs.tech/">
+          
+            <img class="logo" src="//dubs.tech/images/logo.png" alt="dubs·tech">
+          
+          <a href="//dubs.tech/" class="title"> dubs·tech</a>
+        </a>
       </li>
       
+        
+        
+
+        
+          <li class="header-item "><a href="//dubs.tech/categories"><h3>Categories</h3></a>
+            <ul class="header-submenu">
+              
+                
+                  <li class="sub-item"><a href="//dubs.tech/categories/#guides">guides</a></li>
+              
+            </ul>
+          </li>
+        
+      
+        
+        
+
+        
+            
+                <li class="header-item "><a href="//dubs.tech/tags"><h3>Tags</h3></a></li>
+            
+        
+      
+        
+        
+
+        
+            
+                <li class="header-item "><a href="//dubs.tech/"><h3>Home</h3></a></li>
+            
+        
+      
+      <li class="header-item"><a href="//dubs.tech/search"><h3><i class="fa fa-search"></i></h3></a></li>
+    </ul>
+  </div>
+<div class="entry-header">
+  <div class="header-title">
+    <div class="header-title-wrap">
+      <h1>dubs.tech blog - mostly on technology</h1>
+      
+        <h2><span class="entry-date"><time>&nbsp;</time></span></h2>
+      
+
+      
+          <p class="entry-reading-time">
+            &nbsp;
+          </p><!-- /.entry-reading-time -->
+      
+    </div><!-- /.header-title-wrap -->
+  </div><!-- /.header-title -->
+</div><!-- /.entry-header -->
+
+
+<nav id="menu" style="display: none">
+  <ul>
+    
+      
+        <li><a href="//dubs.tech/"><h3>Home</h3></a></li>
+      
+    
+      
+        <li><a href="//dubs.tech/tags"><h3>Tags</h3></a></li>
+      
+    
+      
+        <li><a href="//dubs.tech/categories"><h3>Categories</h3></a>
+          <ul>
+            
+              
+                <li><a href="//dubs.tech/categories/#guides">guides</a></li>
+            
+          </ul>
+        </li>
+      
+    
   </ul>
-<div class="credits">
-<span>&copy; 2016 &nbsp;&nbsp;PAUL DUBS</span></br> <br>
-</div>  
-</footer>
-  </body>
+</nav>
+
+<div id="main" role="main">
+  
+<article class="hentry">
+  <header>
+    
+    <div class="entry-meta">
+      <span class="entry-date date published updated"><time datetime="2018-02-05T10:35:26+01:00"><a href="//dubs.tech/guides/maven-essentials/">February 05, 2018</a></time></span><span class="author vcard"><span class="fn"><a href="//dubs.tech/about/" title="About Paul Dubs">Paul Dubs</a></span></span>
+      
+      <span class="entry-reading-time">
+        <i class="fa fa-clock-o"></i>
+        
+        Reading time ~16 minutes
+      </span><!-- /.entry-reading-time -->
+      
+    </div><!-- /.entry-meta -->
+    
+      <h1 class="entry-title"><a href="//dubs.tech/guides/maven-essentials/" rel="bookmark" title="Maven: Essentials" itemprop="url">Maven: Essentials</a></h1>
+    
+  </header>
+  <div class="entry-content">
+      <p>This guide will explain the essentials you will need to get productive with Maven immediately. It is written with a complete beginner in mind. You should read this, if you don’t have any experience with Java package or dependency management beyond simply putting <code class="highlighter-rouge">.jar</code> files on your class path.</p>
+
+<p>You might have been looking to use a library, and just couldn’t find the <code class="highlighter-rouge">.jar</code> file for it, or you’ve been told to “just use Maven.” Maybe you just switched over to Java from a different programming language, and you want to know how dependency management works.</p>
+
+
+      
+          <div align="center">
+              <div markdown="0"><a href="//dubs.tech/guides/maven-essentials/" class="btn btn-info">Continue Reading ...</a></div>
+          </div>
+      
+  </div><!-- /.entry-content -->
+</article><!-- /.hentry -->
+
+
+
+
+</div><!-- /#main -->
+
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">window.jQuery || document.write('<script type="text/javascript" src="//dubs.tech/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script type="text/javascript" src="//dubs.tech/assets/js/scripts.min.js"></script>
+<script type="text/javascript" async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
+<script type="text/javascript">!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+
+
+<!-- Asynchronous Google Analytics snippet -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-2996078-30', 'auto');
+  ga('require', 'linkid', 'linkid.js');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+
+
+<div class="footer-wrapper">
+  <footer role="contentinfo">
+    <span>&copy; 2018 Paul Dubs.</span>
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+</body>
 </html>
