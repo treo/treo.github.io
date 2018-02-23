@@ -4,13 +4,40 @@
 <generator uri="https://github.com/mojombo/jekyll">Jekyll</generator>
 <link rel="self" type="application/atom+xml" href="//dubs.tech/feed.xml" />
 <link rel="alternate" type="text/html" href="//dubs.tech" />
-<updated>2018-02-06T09:56:52+01:00</updated>
+<updated>2018-02-23T09:29:30+01:00</updated>
 <id>//dubs.tech/</id>
 <author>
   <name>Paul Dubs</name>
   <uri>//dubs.tech/</uri>
   <email>paul.dubs@gmail.com</email>
 </author>
+
+
+<entry>
+  <title type="html"><![CDATA[Implementing Conway’s Game of Life with Tensor Math]]></title>
+ <link rel="alternate" type="text/html" href="//dubs.tech/blog/game-of-life-apl-nd4j-samediff/" />
+  <id>//dubs.tech/blog/game-of-life-apl-nd4j-samediff</id>
+  <published>2018-02-23T09:28:40+01:00</published>
+  <updated>2018-02-23T09:28:40+01:00</updated>
+  <author>
+    <name>Paul Dubs</name>
+    <uri>//dubs.tech</uri>
+    <email>paul.dubs@gmail.com</email>
+  </author>
+  <content type="html">
+    &lt;p&gt;Conway’s Game of Life is a simple simulation that works on a two-dimensional plane. It has just a few very simple rules:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;An empty cell that has exactly 3 neighbors will be populated in the next timestep&lt;/li&gt;
+  &lt;li&gt;A populated cell requires either 2 or 3 neighbors to stay populated, i.e. it will be unpopulated in the next timestep for any other case.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;There are a lot of different ways to implement those rules. This post first looks at a solution in a quite unusual language, namely APL, before showing how to do the same thing using the Java tensor math library ND4J and its upcoming graph variant SameDiff.&lt;/p&gt;
+
+
+    &lt;p&gt;&lt;a href=&quot;//dubs.tech/blog/game-of-life-apl-nd4j-samediff/&quot;&gt;Implementing Conway’s Game of Life with Tensor Math&lt;/a&gt; was originally published by Paul Dubs at &lt;a href=&quot;//dubs.tech&quot;&gt;dubs·tech&lt;/a&gt; on February 23, 2018.&lt;/p&gt;
+  </content>
+</entry>
 
 
 <entry>
