@@ -407,17 +407,17 @@ package: tech.dubs.example
 <figure class="highlight"><pre><code class="language-xml" data-lang="xml">  <span class="nt">&lt;dependency&gt;</span>
     <span class="nt">&lt;groupId&gt;</span>org.deeplearning4j<span class="nt">&lt;/groupId&gt;</span>
     <span class="nt">&lt;artifactId&gt;</span>deeplearning4j-core<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version&gt;</span>0.9.1<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0.0-alpha<span class="nt">&lt;/version&gt;</span>
   <span class="nt">&lt;/dependency&gt;</span>
   <span class="nt">&lt;dependency&gt;</span>
     <span class="nt">&lt;groupId&gt;</span>org.datavec<span class="nt">&lt;/groupId&gt;</span>
     <span class="nt">&lt;artifactId&gt;</span>datavec-api<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version&gt;</span>0.9.1<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0.0-alpha<span class="nt">&lt;/version&gt;</span>
   <span class="nt">&lt;/dependency&gt;</span>
   <span class="nt">&lt;dependency&gt;</span>
     <span class="nt">&lt;groupId&gt;</span>org.nd4j<span class="nt">&lt;/groupId&gt;</span>
     <span class="nt">&lt;artifactId&gt;</span>nd4j-native-platform<span class="nt">&lt;/artifactId&gt;</span>
-    <span class="nt">&lt;version&gt;</span>0.9.1<span class="nt">&lt;/version&gt;</span>
+    <span class="nt">&lt;version&gt;</span>1.0.0-alpha<span class="nt">&lt;/version&gt;</span>
   <span class="nt">&lt;/dependency&gt;</span></code></pre></figure>
 
 <p>Now you can use Deeplearning4J on your CPU in your project, and utilize its datavec API to load data for it. However, that isn’t the reason why it is the chosen example. When assembling the single modules of Deeplearning4J, you have to ensure that they are all using the same version, or you may get hard to debug problems. So, if you want to update it, you will have to change all versions at the same time. As that can be a bit tricky once you have a lot of dependencies and it would open up the possibility that you overlook one of them, there is also a better way to do this.</p>
@@ -425,10 +425,10 @@ package: tech.dubs.example
 <p>Define a property that you can use as a variable instead. Add the following inside your project tag:</p>
 
 <figure class="highlight"><pre><code class="language-xml" data-lang="xml">  <span class="nt">&lt;properties&gt;</span>
-    <span class="nt">&lt;dl4j.version&gt;</span>0.9.1<span class="nt">&lt;/dl4j.version&gt;</span>
+    <span class="nt">&lt;dl4j.version&gt;</span>1.0.0-alpha<span class="nt">&lt;/dl4j.version&gt;</span>
   <span class="nt">&lt;/properties&gt;</span></code></pre></figure>
 
-<p>Using the <code class="highlighter-rouge">dl4j.version</code> tag you can now define that the Deeplearning4J version that you want to use is <code class="highlighter-rouge">0.9.1</code>. But, you still have to actually change the versions inside the dependencies, or it will have no effect. In order to do so, update the version tag of your new dependencies to <code class="highlighter-rouge">${dl4j.version}</code>. This will insert the value that you defined using the <code class="highlighter-rouge">dl4j.version</code> tag.</p>
+<p>Using the <code class="highlighter-rouge">dl4j.version</code> tag you can now define that the Deeplearning4J version that you want to use is <code class="highlighter-rouge">1.0.0-alpha</code>. But, you still have to actually change the versions inside the dependencies, or it will have no effect. In order to do so, update the version tag of your new dependencies to <code class="highlighter-rouge">${dl4j.version}</code>. This will insert the value that you defined using the <code class="highlighter-rouge">dl4j.version</code> tag.</p>
 
 <p>There is nothing special about the <code class="highlighter-rouge">dl4j.version</code> tag, you might have called it <code class="highlighter-rouge">foo.bar.baz</code> instead, and used <code class="highlighter-rouge">${foo.bar.baz}</code> to mark the places where you want its value inserted. You can use pretty much every name that you can think of here, however, some are already taken. So you should steer clear of using the <code class="highlighter-rouge">pom</code>, <code class="highlighter-rouge">settings</code>, <code class="highlighter-rouge">scm</code>, <code class="highlighter-rouge">parent</code> and <code class="highlighter-rouge">project</code> prefixes as well as the properties that define the project itself (i.e. <code class="highlighter-rouge">name</code>, <code class="highlighter-rouge">groupId</code>, <code class="highlighter-rouge">artifactId</code>, <code class="highlighter-rouge">version</code>, etc…).</p>
 
@@ -445,7 +445,7 @@ package: tech.dubs.example
     <span class="nt">&lt;url&gt;</span>http://maven.apache.org<span class="nt">&lt;/url&gt;</span>
 
     <span class="nt">&lt;properties&gt;</span>
-        <span class="nt">&lt;dl4j.version&gt;</span>0.9.1<span class="nt">&lt;/dl4j.version&gt;</span>
+        <span class="nt">&lt;dl4j.version&gt;</span>1.0.0-alpha<span class="nt">&lt;/dl4j.version&gt;</span>
     <span class="nt">&lt;/properties&gt;</span>
 
     <span class="nt">&lt;dependencies&gt;</span>
@@ -562,7 +562,7 @@ Hello World!
     <span class="nt">&lt;url&gt;</span>http://maven.apache.org<span class="nt">&lt;/url&gt;</span>
 
     <span class="nt">&lt;properties&gt;</span>
-        <span class="nt">&lt;dl4j.version&gt;</span>0.9.1<span class="nt">&lt;/dl4j.version&gt;</span>
+        <span class="nt">&lt;dl4j.version&gt;</span>1.0.0-alpha<span class="nt">&lt;/dl4j.version&gt;</span>
     <span class="nt">&lt;/properties&gt;</span>
 
     <span class="nt">&lt;dependencies&gt;</span>
