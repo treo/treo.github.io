@@ -1,6 +1,14 @@
 [
   
     {
+      "title"    : "Benchmarking ND4J and Neanderthal",
+      "category" : "",
+      "tags"     : "nd4j",
+      "url"      : "https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/",
+      "date"     : "2018-06-26 13:17:10 +0200"
+    } ,
+  
+    {
       "title"    : "Implementing Conway’s Game of Life with Tensor Math",
       "category" : "",
       "tags"     : "apl, nd4j, samediff",

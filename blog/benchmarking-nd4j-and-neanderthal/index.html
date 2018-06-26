@@ -5,9 +5,9 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 <head>
 <meta charset="utf-8">
-<title>dubs.tech blog - mostly on technology &#8211; dubs·tech</title>
-<meta name="description" content="dubs.tech blog - mostly on technology">
-<meta name="keywords" content="java, kotlin, deeplearning">
+<title>Benchmarking ND4J and Neanderthal &#8211; dubs·tech</title>
+<meta name="description" content="Comparing the overhead of the two fastest matrix math libraries on the JVM.">
+<meta name="keywords" content="nd4j">
 
 <!-- Twitter Cards -->
 <meta name="twitter:card" content="summary">
@@ -17,9 +17,9 @@
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:title" content="dubs.tech blog - mostly on technology">
-<meta property="og:description" content="dubs.tech blog - mostly on technology">
-<meta property="og:url" content="https://www.dubs.tech/">
+<meta property="og:title" content="Benchmarking ND4J and Neanderthal">
+<meta property="og:description" content="Comparing the overhead of the two fastest matrix math libraries on the JVM.">
+<meta property="og:url" content="https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/">
 <meta property="og:site_name" content="dubs·tech">
 <meta property="og:image" content="https://www.dubs.tech/images/images/logo.png">
 
@@ -27,7 +27,7 @@
 
 
 
-<link rel="canonical" href="https://www.dubs.tech/">
+<link rel="canonical" href="https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/">
 <link href="https://www.dubs.tech/feed.xml" type="application/atom+xml" rel="alternate" title="dubs·tech Feed">
 
 <!-- http://t.co/dKP3o1e -->
@@ -66,7 +66,7 @@
 
 </head>
 
-<body id="post-index">
+<body id="post" >
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 
@@ -125,15 +125,17 @@
 <div class="entry-header">
   <div class="header-title">
     <div class="header-title-wrap">
-      <h1>dubs.tech blog - mostly on technology</h1>
+      <h1>Benchmarking ND4J and Neanderthal</h1>
       
-        <h2><span class="entry-date"><time>&nbsp;</time></span></h2>
+        <h2><span class="entry-date date published updated"><time datetime="2018-06-26T13:17:10+02:00">June 26, 2018</time></span></h2>
       
 
       
-          <p class="entry-reading-time">
-            &nbsp;
-          </p><!-- /.entry-reading-time -->
+        <p class="entry-reading-time">
+          <i class="fa fa-clock-o"></i>
+          
+          Reading time ~11 minutes
+        </p><!-- /.entry-reading-time -->
       
     </div><!-- /.header-title-wrap -->
   </div><!-- /.header-title -->
@@ -169,25 +171,10 @@
 </nav>
 
 <div id="main" role="main">
-  
-<article class="hentry">
-  <header>
-    
-    <div class="entry-meta">
-      <span class="entry-date date published updated"><time datetime="2018-06-26T13:17:10+02:00"><a href="https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/">June 26, 2018</a></time></span><span class="author vcard"><span class="fn"><a href="https://www.dubs.tech/about/" title="About Paul Dubs">Paul Dubs</a></span></span>
-      
-      <span class="entry-reading-time">
-        <i class="fa fa-clock-o"></i>
+  <article class="hentry">
+    <div class="entry-content">
         
-        Reading time ~11 minutes
-      </span><!-- /.entry-reading-time -->
-      
-    </div><!-- /.entry-meta -->
-    
-      <h1 class="entry-title"><a href="https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/" rel="bookmark" title="Benchmarking ND4J and Neanderthal" itemprop="url">Benchmarking ND4J and Neanderthal</a></h1>
-    
-  </header>
-  <div class="entry-content">
+      <h1 class="post-title entry-title">Benchmarking ND4J and Neanderthal</h1>
       <p><a href="https://nd4j.org/">ND4J</a> and <a href="https://neanderthal.uncomplicate.org/">Neanderthal</a> are both libraries for fast matrix math on the JVM. ND4J targets Java users, while Neanderthal is aimed at Clojure users. Due to Clojure’s excellent Java Interop, it is quite easy to use ND4J in Clojure as well — even though it doesn’t provide an idiomatic Clojure API out of the box.</p>
 
 <p>Dragan Djuric, the creator of Neanderthal, has recently <a href="https://dragan.rocks/articles/18/Neanderthal-vs-ND4J-vol1">conducted a micro-benchmark of both ND4J and Neanderthal</a>. The operation under test is matrix multiplication, in particular, calling GEMM from <a href="https://software.intel.com/en-us/mkl">Intel’s MKL</a> library. The results have been quite unexpected, since both libraries shouldn’t do that much at that point, they basically pass on the call to MKL.</p>
@@ -697,80 +684,70 @@
 
 <p>There are still some points where ND4J could lose some more overhead, and we are investigating them, so I’m looking forward to repeating these benchmarks as soon as we have them figured out as well.</p>
 
-      
-  </div><!-- /.entry-content -->
-</article><!-- /.hentry -->
-
-<article class="hentry">
-  <header>
-    
-    <div class="entry-meta">
-      <span class="entry-date date published updated"><time datetime="2018-02-23T09:28:40+01:00"><a href="https://www.dubs.tech/blog/game-of-life-apl-nd4j-samediff/">February 23, 2018</a></time></span><span class="author vcard"><span class="fn"><a href="https://www.dubs.tech/about/" title="About Paul Dubs">Paul Dubs</a></span></span>
-      
-      <span class="entry-reading-time">
-        <i class="fa fa-clock-o"></i>
+      <footer class="entry-meta">
+        <span class="entry-tags"><a href="https://www.dubs.tech/tags#nd4j" title="Pages tagged nd4j" class="tag"><span class="term">nd4j</span></a></span>
         
-        Reading time ~18 minutes
-      </span><!-- /.entry-reading-time -->
-      
-    </div><!-- /.entry-meta -->
-    
-      <h1 class="entry-title"><a href="https://www.dubs.tech/blog/game-of-life-apl-nd4j-samediff/" rel="bookmark" title="Implementing Conway’s Game of Life with Tensor Math" itemprop="url">Implementing Conway’s Game of Life with Tensor Math</a></h1>
-    
-  </header>
-  <div class="entry-content">
-      <p>Conway’s Game of Life is a simple simulation that works on a two-dimensional plane. It has just a few very simple rules:</p>
+        <span class="author vcard"><span class="fn">Paul Dubs</span></span>
+        <div class="social-share">
+  <ul class="socialcount socialcount-small inline-list">
+    <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+    <li class="twitter"><a href="https://twitter.com/intent/tweet?text=https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+    <li class="googleplus"><a href="https://plus.google.com/share?url=https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+  </ul>
+</div><!-- /.social-share -->
 
-<ul>
-  <li>An empty cell that has exactly 3 neighbors will be populated in the next timestep</li>
-  <li>A populated cell requires either 2 or 3 neighbors to stay populated, i.e. it will be unpopulated in the next timestep for any other case.</li>
-</ul>
-
-<p>There are a lot of different ways to implement those rules. This post first looks at a solution in a quite unusual language, namely APL, before showing how to do the same thing using the Java tensor math library ND4J and its upcoming graph variant SameDiff.</p>
-
-
-      
-          <div align="center">
-              <div markdown="0"><a href="https://www.dubs.tech/blog/game-of-life-apl-nd4j-samediff/" class="btn btn-info">Continue Reading ...</a></div>
-          </div>
-      
-  </div><!-- /.entry-content -->
-</article><!-- /.hentry -->
-
-<article class="hentry">
-  <header>
-    
-    <div class="entry-meta">
-      <span class="entry-date date published updated"><time datetime="2018-02-05T10:35:26+01:00"><a href="https://www.dubs.tech/guides/maven-essentials/">February 05, 2018</a></time></span><span class="author vcard"><span class="fn"><a href="https://www.dubs.tech/about/" title="About Paul Dubs">Paul Dubs</a></span></span>
-      
-      <span class="entry-reading-time">
-        <i class="fa fa-clock-o"></i>
+      </footer>
+    </div><!-- /.entry-content -->
+    <div class="read-more">
+  <div class="read-more-header">
+    <a href="/about" class="read-more-btn">About the Author</a>
+  </div><!-- /.read-more-header -->
+  <div class="read-more-content author-info">
+    <h3>Paul Dubs</h3>
+    <div class="author-container">
+      <img class="author-img" src="https://www.dubs.tech/images/avatar.jpg" alt="Paul Dubs" />
+      <div class="author-bio">Professional software developer for over 12 years. Passionate about creating maintainable solutions and helping people to learn.</div>
+    </div>
+    <div class="author-share">
+      <ul class="list-inline social-buttons">
         
-        Reading time ~16 minutes
-      </span><!-- /.entry-reading-time -->
+          <li><a href="https://github.com/treo" target="_blank"><i class="fa fa-github fa-fw"></i></a></li>
+        
+          <li><a href="https://www.linkedin.com/in/paul-dubs" target="_blank"><i class="fa fa-linkedin fa-fw"></i></a></li>
+        
+      </ul>
       
-    </div><!-- /.entry-meta -->
+        <a aria-label="Follow @treo on GitHub" data-style="mega" href="https://github.com/treo" class="github-button">Follow @treo</a>
+      
+      <br>
+      
+        <a href="https://twitter.com/dot_treo" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @dot_treo</a>
+      
+    </div>
+  </div>
+</div>
+
     
-      <h1 class="entry-title"><a href="https://www.dubs.tech/guides/maven-essentials/" rel="bookmark" title="Maven: Essentials" itemprop="url">Maven: Essentials</a></h1>
+    <div class="read-more">
+  
+    <div class="read-more-header">
+      <a href="https://www.dubs.tech/blog/game-of-life-apl-nd4j-samediff/" class="read-more-btn">Read More</a>
+    </div><!-- /.read-more-header -->
+    <div class="read-more-content">
+      <h3><a href="https://www.dubs.tech/blog/game-of-life-apl-nd4j-samediff/" title="Implementing Conway’s Game of Life with Tensor Math">Implementing Conway’s Game of Life with Tensor Math</a></h3>
+      <p>Exploring the similarities between APL and tensor math libraries. <a href="https://www.dubs.tech/blog/game-of-life-apl-nd4j-samediff/">Continue reading</a></p>
+    </div><!-- /.read-more-content -->
+  
+  <div class="read-more-list">
     
-  </header>
-  <div class="entry-content">
-      <p>This guide will explain the essentials you will need to get productive with Maven immediately. It is written with a complete beginner in mind. You should read this, if you don’t have any experience with Java package or dependency management beyond simply putting <code class="highlighter-rouge">.jar</code> files on your class path.</p>
-
-<p>You might have been looking to use a library, and just couldn’t find the <code class="highlighter-rouge">.jar</code> file for it, or you’ve been told to “just use Maven.” Maybe you just switched over to Java from a different programming language, and you want to know how dependency management works.</p>
-
-
-      
-          <div align="center">
-              <div markdown="0"><a href="https://www.dubs.tech/guides/maven-essentials/" class="btn btn-info">Continue Reading ...</a></div>
-          </div>
-      
-  </div><!-- /.entry-content -->
-</article><!-- /.hentry -->
-
-
-
-
+      <div class="list-item">
+        <h4><a href="https://www.dubs.tech/guides/maven-essentials/" title="Maven: Essentials">Maven: Essentials</a></h4>
+        <span>Published on February 05, 2018</span>
+      </div><!-- /.list-item -->
+    
+  </div><!-- /.read-more-list -->
+</div><!-- /.read-more -->
+  </article>
 </div><!-- /#main -->
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -778,6 +755,7 @@
 <script type="text/javascript" src="https://www.dubs.tech/assets/js/scripts.min.js"></script>
 <script type="text/javascript" async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
 <script type="text/javascript">!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
 
 
 

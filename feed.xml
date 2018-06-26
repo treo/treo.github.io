@@ -4,13 +4,539 @@
 <generator uri="https://github.com/mojombo/jekyll">Jekyll</generator>
 <link rel="self" type="application/atom+xml" href="https://www.dubs.tech/feed.xml" />
 <link rel="alternate" type="text/html" href="https://www.dubs.tech" />
-<updated>2018-05-25T10:01:28+02:00</updated>
+<updated>2018-06-26T13:17:27+02:00</updated>
 <id>https://www.dubs.tech/</id>
 <author>
   <name>Paul Dubs</name>
   <uri>https://www.dubs.tech/</uri>
   <email>paul.dubs@gmail.com</email>
 </author>
+
+
+<entry>
+  <title type="html"><![CDATA[Benchmarking ND4J and Neanderthal]]></title>
+ <link rel="alternate" type="text/html" href="https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/" />
+  <id>https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal</id>
+  <published>2018-06-26T13:17:10+02:00</published>
+  <updated>2018-06-26T13:17:10+02:00</updated>
+  <author>
+    <name>Paul Dubs</name>
+    <uri>https://www.dubs.tech</uri>
+    <email>paul.dubs@gmail.com</email>
+  </author>
+  <content type="html">
+    &lt;p&gt;&lt;a href=&quot;https://nd4j.org/&quot;&gt;ND4J&lt;/a&gt; and &lt;a href=&quot;https://neanderthal.uncomplicate.org/&quot;&gt;Neanderthal&lt;/a&gt; are both libraries for fast matrix math on the JVM. ND4J targets Java users, while Neanderthal is aimed at Clojure users. Due to Clojure’s excellent Java Interop, it is quite easy to use ND4J in Clojure as well — even though it doesn’t provide an idiomatic Clojure API out of the box.&lt;/p&gt;
+
+&lt;p&gt;Dragan Djuric, the creator of Neanderthal, has recently &lt;a href=&quot;https://dragan.rocks/articles/18/Neanderthal-vs-ND4J-vol1&quot;&gt;conducted a micro-benchmark of both ND4J and Neanderthal&lt;/a&gt;. The operation under test is matrix multiplication, in particular, calling GEMM from &lt;a href=&quot;https://software.intel.com/en-us/mkl&quot;&gt;Intel’s MKL&lt;/a&gt; library. The results have been quite unexpected, since both libraries shouldn’t do that much at that point, they basically pass on the call to MKL.&lt;/p&gt;
+
+&lt;p&gt;When the results had shown that Neanderthal is 24 times faster with the smallest input of a 4x4 matrix, and still 20% faster at 4096x4096, it made me curious to what is going on. Especially since his ND4J code is based on &lt;a href=&quot;https://github.com/treo/benchmarking_nd4j/blob/master/src/main/java/com/example/neanderthal/NeanderthalComparison_2x2.java&quot;&gt;my original benchmarks&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;When I originally compared ND4J and Neanderthal matrix multiplication speeds, the results left me wondering, since ND4J was slower at small sizes, yet faster at larger sizes. For this reason I never actually published any numbers. I originally based my comparison on &lt;a href=&quot;https://github.com/uncomplicate/neanderthal/blob/1fe9d82ecd5d4ee4d7b19d9dbf8105ede9b5e83b/examples/benchmarks/src/benchmarks/core.clj&quot;&gt;Dragan’s benchmark code&lt;/a&gt;, but I didn’t notice that doubles were used there instead of floats. His new benchmark has cleared this confusion, and I’m glad that Dragan has shared both code and results.&lt;/p&gt;
+
+&lt;p&gt;In this post I try to validate Dragan’s results, show the detail that changes the numbers considerably, and rerun the benchmark after some additional optimizations have been added to ND4J.&lt;/p&gt;
+
+&lt;h1 id=&quot;apple-to-apple-comparison-changing-some-code&quot;&gt;Apple to Apple comparison: Changing some code&lt;/h1&gt;
+
+&lt;p&gt;In Dragan’s benchmark, Neanderthal wins with by a large margin. So let’s take a look at the code to see if there is anything we can do to improve ND4J’s performance. Dragan uses this code to run the benchmark for nd4j:&lt;/p&gt;
+
+&lt;div class=&quot;language-clojure highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;defn&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bench-nd4j-mmuli-float&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;long&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;long&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;long&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;let&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Nd4j/rand&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Nd4j/rand&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Nd4j/createUninitialized&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;quick-bench&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+     &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;do&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.mmuli&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;INDArray&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;INDArray&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;INDArray&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And while this looks correct, it actually has an issue. In ND4J arrays are C-ordered by default, i.e. their memory layout is as if you were to allocate an array in C. Yet, GEMM returns its result in F-order, i.e. with a memory layout that you would get if you allocated an array in Fortran. The difference is whether your two dimensional array is organized as &lt;code class=&quot;highlighter-rouge&quot;&gt;[rows][columns]&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;[columns][rows]&lt;/code&gt;. If you pass a C-ordered array to take the result here, ND4J will notice this, create a new array in F-order, and then transfer the results to the original result array. All of this takes time, and especially in a micro-benchmark case where this is called thousands of times per second, memory allocation can become quite the bottleneck.&lt;/p&gt;
+
+&lt;p&gt;After changing the code to use F-ordered arrays it looked like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-clojure highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;defn&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bench-nd4j-mmuli-float&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;long&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;long&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;long&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;let&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Nd4j/rand&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Nd4j/rand&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Nd4j/createUninitialized&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;int-array&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;\f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;quick-bench&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+     &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;do&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;.mmuli&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;INDArray&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;INDArray&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;INDArray&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And when I ran it with a tiny matrix, it was a lot faster – 5 times faster – but it was also still about 2 times slower than running the same code from Java directly in my JMH benchmark suite. I’m not sure what is the cause for this. But, since we want to actually compare apples to apples, I decided to change the call itself. &lt;code class=&quot;highlighter-rouge&quot;&gt;INDArray.mmuli&lt;/code&gt; has some additional checks to support some not-actually matrix multiplication use-cases.&lt;/p&gt;
+
+&lt;p&gt;After checking Neanderthal’s source code to see if it would still be a fair comparison, I moved on to using &lt;code class=&quot;highlighter-rouge&quot;&gt;Nd4j.gemm&lt;/code&gt; directly. It is the closest in actual functionality to Neanderthal’s &lt;code class=&quot;highlighter-rouge&quot;&gt;mm!&lt;/code&gt; call. Both of them do some basic parameter checking before passing them on to MKL. In the case of ND4J it also enforces the ordering, as explained earlier. The following is the benchmark code that I ended up using:&lt;/p&gt;
+
+&lt;div class=&quot;language-clojure highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;defn&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bench-nd4j-gemm-float&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;long&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;long&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;long&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;let&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Nd4j/rand&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Nd4j/rand&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;k&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Nd4j/createUninitialized&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;int-array&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;sc&quot;&gt;\f&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;quick-bench&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+     &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;do&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;Nd4j/gemm&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;INDArray&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m1&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;INDArray&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;m2&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;INDArray&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;1.0&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;0.0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+         &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And it turns out that this way of calling GEMM appears to be exactly as fast when called from JMH and from &lt;a href=&quot;https://github.com/hugoduncan/criterium/&quot;&gt;Criterium&lt;/a&gt; (the benchmarking library that provides us with the quick-bench method).&lt;/p&gt;
+
+&lt;p&gt;I’ve also created a &lt;a href=&quot;https://github.com/uncomplicate/neanderthal/pull/46&quot;&gt;pull request for Neanderthal&lt;/a&gt;, so the benchmark code there is closer to an apple to apple comparison.&lt;/p&gt;
+
+&lt;h1 id=&quot;first-benchmarking-results&quot;&gt;First benchmarking results&lt;/h1&gt;
+
+&lt;p&gt;Aside from this modification, I use the original benchmark code by Dragan, using Criterium as the benchmarking library and Neanderthal 0.19 and ND4J 1.0.0-beta. My computer is equipped with an Intel Core i7-6700K, running at 4.6GHz, 32GB RAM running at 2933MHz and uses Windows 10 as the operating system.&lt;/p&gt;
+
+&lt;p&gt;Since Windows likes doing Windows things in the background, I’ve ran the benchmark 10 times for each matrix size, alternating between Neanderthal and ND4J, and averaged the numbers afterwards.&lt;/p&gt;
+
+&lt;table rules=&quot;groups&quot;&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;Library&lt;/th&gt;
+      &lt;th style=&quot;text-align: right&quot;&gt;Size&lt;/th&gt;
+      &lt;th style=&quot;text-align: right&quot;&gt;Time per Op (ns)&lt;/th&gt;
+      &lt;th style=&quot;text-align: right&quot;&gt;Diff vs Neanderthal&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;2x2&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;595&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;166 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;2x2&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;223&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;4x4&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;598&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;163 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;4x4&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;227&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;8x8&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;612&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;156 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;8x8&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;239&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;16x16&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;715&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;134 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;16x16&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;305&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;32x32&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;1312&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;69 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;32x32&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;774&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;64x64&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;4519&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;40 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;64x64&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;3208&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;128x128&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;19288&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;18 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;128x128&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;16285&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;256x256&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;120588&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;1 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;256x256&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;118917&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;512x512&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;907426&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;3 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;512x512&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;880935&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;1024x1024&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;7119631&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;5 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;1024x1024&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;6803776&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;2048x2048&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;53491781&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;7 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;2048x2048&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;49876333&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;4096x4096&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;397762380&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;-8 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;4096x4096&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;437036465&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;8192x8192&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;3480873900&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;0 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;8192x8192&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;3452838100&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;The table shows that after a matrix size of 256x256 the performance of both libraries is within the margin of error of each other. But when using smaller matrices, it is apparent that Neanderthal indeed has a lower overhead. The difference isn’t as high as Dragan found, and in absolute terms about 350ns to 400ns may seem insignificant, yet we should still try to get it down to the bare minimum. This is even more true, if you consider that for those tiny matrices where this overhead is twice the time that Neanderthal needs.&lt;/p&gt;
+
+&lt;h1 id=&quot;investigating-the-source-of-added-overhead&quot;&gt;Investigating the source of added overhead&lt;/h1&gt;
+
+&lt;p&gt;In order to find out where some of that latency was hiding, I used an even lower level way of calling GEMM from Java. Since JavaCPP provides the bindings to the lower level libraries, and those bindings are public static methods, they can be also used directly. So, in order to find out if the source of this additional latency is on the Java side of things or on the native side, I used that call directly. The result: 231 ± 4 ns per operation, which looks very much like it is within the margin of error of Neanderthal. The additional latency has to be on the Java side.&lt;/p&gt;
+
+&lt;p&gt;With those numbers in hand &lt;a href=&quot;https://github.com/raver119&quot;&gt;@raver119&lt;/a&gt; has taken to the code, and started investigating what may be the cause of it. He found &lt;a href=&quot;https://github.com/deeplearning4j/deeplearning4j/commit/70dc867fe8e1cc21ad47473d5c99517537286728&quot;&gt;one reason&lt;/a&gt;, and the change has already landed on master, and is therefore available on SNAPSHOT releases.&lt;/p&gt;
+
+&lt;h1 id=&quot;repeating-the-benchmark&quot;&gt;Repeating the Benchmark&lt;/h1&gt;
+
+&lt;p&gt;With that change in place, I wanted to repeat the benchmark. Now something weird happened: Using the criterium based benchmark code, now both Neanderthal and ND4J were 2 times slower than before. I changed back to the old version to make sure it wasn’t due to the change in ND4J, but it stayed this way.&lt;/p&gt;
+
+&lt;p&gt;Interestingly, my own benchmarks with JMH didn’t suffer from this, so I set out to port the Clojure code to Java. Thus using the Clojure to Java Interop into this direction for the first time. While the direction Java to Clojure is quite a breeze, the other way around is pretty ugly as long as there is no specialized API around it. Anyway, I marched on, and figured out how to do it (for more comments on this see &lt;a href=&quot;#oddities&quot;&gt;Oddities&lt;/a&gt;).&lt;/p&gt;
+
+&lt;p&gt;Using the numbers that I originally collected, I validated that Neanderthal was still as fast as it was using the criterium based benchmark. The following table shows the results using JMH as the benchmarking framework, Neanderthal 0.19 and ND4J 1.0.0-SNAPSHOT.&lt;/p&gt;
+
+&lt;table rules=&quot;groups&quot;&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;Library&lt;/th&gt;
+      &lt;th style=&quot;text-align: right&quot;&gt;Size&lt;/th&gt;
+      &lt;th style=&quot;text-align: right&quot;&gt;Time per Op (ns)&lt;/th&gt;
+      &lt;th style=&quot;text-align: right&quot;&gt;Diff vs Neanderthal&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;2x2&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;309&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;32 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;2x2&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;234&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;4x4&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;319&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;31 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;4x4&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;243&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;8x8&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;322&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;29 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;8x8&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;249&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;16x16&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;420&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;31 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;16x16&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;320&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;32x32&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;1005&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;5 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;32x32&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;958&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;64x64&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;3786&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;29 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;64x64&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;2925&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;128x128&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;18816&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;19 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;128x128&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;16683&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;256x256&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;104342&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;-3 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;256x256&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;108048&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;512x512&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;775124&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;1 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;512x512&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;765648&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;1024x1024&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;6534687&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;8 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;1024x1024&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;6031096&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;2048x2048&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;44854846&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;6 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;2048x2048&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;42211136&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;4096x4096&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;317275196&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;-1 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;4096x4096&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;319272117&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;ND4J&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;8192x8192&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;2783549850&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;8 %&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Neanderthal&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;8192x8192&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt;2571527782&lt;/td&gt;
+      &lt;td style=&quot;text-align: right&quot;&gt; &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;We can see that especially for very small matrices the difference has closed a lot. Neanderthal still wins here though and is still about 30% faster when the overhead dominates the actual calculation. So, we still have to look for ways to reduce our overall overhead some more.&lt;/p&gt;
+
+&lt;p&gt;For larger sizes, as could already be seen in the first benchmark, the difference isn’t that clear. During preparation of this post, I’ve seen the numbers fluctuate for about 10% in any direction, so everything within 10% of each other is a draw for me at the moment.&lt;/p&gt;
+
+&lt;h1 id=&quot;oddities&quot;&gt;Oddities&lt;/h1&gt;
+
+&lt;p&gt;While preparing this blog post I ran into several odd behaviors.&lt;/p&gt;
+
+&lt;p&gt;One is the criterium benchmark seemingly getting slower over time, even as I’ve restarted JVMs. Only after several reboots it went back to normal behavior. I’m stumped as to why that may happen.&lt;/p&gt;
+
+&lt;p&gt;Then there were those 10% swings for both libraries, even when a benchmark was run for many interations. I may run a benchmark for quite a few iterations and get a number on which JMH is rather certain, showing a pretty low standard deviation, but once I repeat it I get a swing in either direction, again with a reported low standard deviation.&lt;/p&gt;
+
+&lt;p&gt;I guess that increasing the iteration time could reduce those swings a lot. But, given that I don’t want to compromise on some of the other options (i.e. using at least 2 forks, and using at least 10 benchmark iterations), using 1 minute for each benchmark would require over 8 hours of benchmarking. And since I’ve seen irregularities even with that on the larger sizes as well, I’d probably have to up that to 5 minutes, which would take almost two whole days to finish the benchmark for all sizes. Therefore, I’ll be content with saying that everything within 10% of each other is close enough to be considered a draw.&lt;/p&gt;
+
+&lt;p&gt;And I’m not even sure I could run the whole benchmark for that long. Originally, I wanted to use at least 10 seconds for each benchmark iteration, but, my computer crashes during the Neanderthal 64x64 benchmark if it runs for longer than 5 seconds. I guess it is due to the mild overclock, since it seems to cope better once I go back to stock speeds, but I didn’t have any issue with that using ND4J on that same size, and during the last 3 years that I’ve had this computer.&lt;/p&gt;
+
+&lt;p&gt;I found yet another odditiy while trying to make Neanderthal work in JMH. I ran into the issue that Clojure couldn’t cast an AOT compiled version of its pretty printer into itself, and the results that google spit out didn’t really help with the issue. In the end, I simply removed the AOT compiled version from the uberjar with a maven configuration option and that resolved the issue.&lt;/p&gt;
+
+&lt;h1 id=&quot;repeating-my-benchmarks&quot;&gt;Repeating my benchmarks&lt;/h1&gt;
+
+&lt;p&gt;I’ve updated &lt;a href=&quot;https://github.com/treo/benchmarking_nd4j&quot;&gt;my benchmarking_nd4j repository&lt;/a&gt; to contain everything that I’ve used for the second round of benchmarks. If you want to repeat them on your own machine, you can clone the repository:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;git clone https://github.com/treo/benchmarking_nd4j.git&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Build an Uberjar:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;mvn clean package&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;And run it:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;java -jar target/benchmarks.jar -f2 -i10 -wi 2 Neanderthal&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;This invocation will use 2 forks, 10 iterations per fork and 2 warm up iterations. It uses the default iteration time of just one second. By passing a name fragment, JMH will only start the benchmarks that start with that name. If you leave it out, it will run all benchmarks within the repository, which can take quite a considerable amount of time.&lt;/p&gt;
+
+&lt;p&gt;For more options you can run it as follows to print its help screen:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;java -jar target/benchmarks.jar -h&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Also, please notice, that since I’m using a SNAPSHOT version here, I’m not using the ND4J -platform artifact. For this reason, it will not work, if you upload the jar to a machine using a different operating system or CPU architecture.&lt;/p&gt;
+
+&lt;h1 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h1&gt;
+
+&lt;p&gt;I’m very grateful for Dragan to have conducted his benchmarks on both ND4J and Neanderthal. The investigation that it started has already borne fruit: we have already found and fixed some issues, as you can see in the second benchmark.&lt;/p&gt;
+
+&lt;p&gt;And while the difference even in the first benchmark wasn’t as dramatic once the result array ordering is properly set, it has still shown that Neanderthal indeed has a very low overhead and that to get the full performance out of ND4J you should know what you are doing.&lt;/p&gt;
+
+&lt;p&gt;There are still some points where ND4J could lose some more overhead, and we are investigating them, so I’m looking forward to repeating these benchmarks as soon as we have them figured out as well.&lt;/p&gt;
+
+    &lt;p&gt;&lt;a href=&quot;https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/&quot;&gt;Benchmarking ND4J and Neanderthal&lt;/a&gt; was originally published by Paul Dubs at &lt;a href=&quot;https://www.dubs.tech&quot;&gt;dubs·tech&lt;/a&gt; on June 26, 2018.&lt;/p&gt;
+  </content>
+</entry>
 
 
 <entry>
