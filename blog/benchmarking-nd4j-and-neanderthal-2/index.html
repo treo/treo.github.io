@@ -134,7 +134,7 @@
         <p class="entry-reading-time">
           <i class="fa fa-clock-o"></i>
           
-          Reading time ~6 minutes
+          Reading time ~7 minutes
         </p><!-- /.entry-reading-time -->
       
     </div><!-- /.header-title-wrap -->
@@ -318,7 +318,7 @@ F: 810x100000
     <tr>
       <td style="text-align: left">((((AB)C)D)E)F)</td>
       <td style="text-align: right">13x100000</td>
-      <td style="text-align: right">851,877 GFLOP</td>
+      <td style="text-align: right">2,104 GFLOP</td>
       <td style="text-align: right">4,95 MB</td>
     </tr>
   </tbody>
@@ -326,9 +326,11 @@ F: 810x100000
 
 <p>As you can see, this way of structuring the order of the computation results with the number of rows of the first matrix being carried through the computation. The end result is still the same.</p>
 
-<p>The difference in the required number of floating point operations to perform the actual computation is enormous. The first way requires a total of 11225 GFLOP, while the second one requires only about 853 GFLOP, with pretty much all the time spent on just the last multiplication.</p>
+<p>The difference in the required number of floating point operations to perform the actual computation is enormous. The first way requires a total of 11225 GFLOP, while the second one requires only about 3,1 GFLOP, with pretty much all the time spent on just the last multiplication.</p>
 
 <p>Just the order of those operations results already in a huge difference, but there is even more to it. Once you take into consideration that each matrix at each step is also not just large, but absolutely enormous when compared to each other, you see how caching efficiency and memory access costs will dwarf even the huge difference in required operations.</p>
+
+<p>So why do we see only a 1000x difference in speed? Looking at the GFLOPs alone it should be over 3500x. The reason is that on large multiplications MKL actually uses multiple cores. And since my machine has 4 cores, as Dragan’s probably does, it goes down to be just a fourth of that plus some overhead.</p>
 
 <h1 id="comparing-apples-to-apples-again">Comparing apples to apples again</h1>
 
