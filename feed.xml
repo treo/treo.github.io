@@ -4,13 +4,39 @@
 <generator uri="https://github.com/mojombo/jekyll">Jekyll</generator>
 <link rel="self" type="application/atom+xml" href="https://www.dubs.tech/feed.xml" />
 <link rel="alternate" type="text/html" href="https://www.dubs.tech" />
-<updated>2018-06-26T13:19:10+02:00</updated>
+<updated>2018-06-29T12:13:07+02:00</updated>
 <id>https://www.dubs.tech/</id>
 <author>
   <name>Paul Dubs</name>
   <uri>https://www.dubs.tech/</uri>
   <email>paul.dubs@gmail.com</email>
 </author>
+
+
+<entry>
+  <title type="html"><![CDATA[Benchmarking ND4J and Neanderthal – Part 2]]></title>
+ <link rel="alternate" type="text/html" href="https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal-2/" />
+  <id>https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal-2</id>
+  <published>2018-06-29T12:12:55+02:00</published>
+  <updated>2018-06-29T12:12:55+02:00</updated>
+  <author>
+    <name>Paul Dubs</name>
+    <uri>https://www.dubs.tech</uri>
+    <email>paul.dubs@gmail.com</email>
+  </author>
+  <content type="html">
+    &lt;p&gt;Dragan Djuric, the creator of Neanderthal, has conducted &lt;a href=&quot;https://dragan.rocks/articles/18/Neanderthal-vs-ND4J-vol2&quot;&gt;another series of benchmarks comparing ND4J and Neanderthal&lt;/a&gt;. This time the operation under test is a chain of matrix multiplications.&lt;/p&gt;
+
+&lt;p&gt;He claims that in one of the benchmarks Neanderthal is 1000 times faster. This piqued my interest again since those kinds of differences don’t magically show up – especially not in a library as widely used as ND4J.&lt;/p&gt;
+
+&lt;p&gt;In this post I investigate the source of this difference, show why it happens and what to do about it as a user of the library.&lt;/p&gt;
+
+&lt;p&gt;This is a follow up post to &lt;a href=&quot;https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/&quot;&gt;Benchmarking ND4J and Neanderthal&lt;/a&gt;, so for some more context read that post as well.&lt;/p&gt;
+
+
+    &lt;p&gt;&lt;a href=&quot;https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal-2/&quot;&gt;Benchmarking ND4J and Neanderthal – Part 2&lt;/a&gt; was originally published by Paul Dubs at &lt;a href=&quot;https://www.dubs.tech&quot;&gt;dubs·tech&lt;/a&gt; on June 29, 2018.&lt;/p&gt;
+  </content>
+</entry>
 
 
 <entry>

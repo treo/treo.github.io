@@ -1,0 +1,496 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>Benchmarking ND4J and Neanderthal – Part 2 &#8211; dubs·tech</title>
+<meta name="description" content="A fair comparison between chained matrix multiplication with ND4J and Neanderthal.">
+<meta name="keywords" content="nd4j, benchmarks">
+
+<!-- Twitter Cards -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@dot_treo">
+<meta name="twitter:creator" content="@dot_treo">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Benchmarking ND4J and Neanderthal – Part 2">
+<meta property="og:description" content="A fair comparison between chained matrix multiplication with ND4J and Neanderthal.">
+<meta property="og:url" content="https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal-2/">
+<meta property="og:site_name" content="dubs·tech">
+<meta property="og:image" content="https://www.dubs.tech/images/images/logo.png">
+
+<meta name="google-site-verification" content="n-ohWAcyARq2F3YAT0UtBa3gh0fluEoFMmHupOCXOvs">
+
+
+
+<link rel="canonical" href="https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal-2/">
+<link href="https://www.dubs.tech/feed.xml" type="application/atom+xml" rel="alternate" title="dubs·tech Feed">
+
+<!-- http://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="https://www.dubs.tech/assets/css/main.css">
+<link rel="stylesheet" href="https://www.dubs.tech/assets/css/jquery.mmenu.all.css">
+<link rel="stylesheet" href="https://www.dubs.tech/assets/css/jquery.floating-social-share.min.css">
+<!-- Webfonts -->
+<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic" rel="stylesheet" type="text/css">
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- Load Modernizr -->
+<script type="text/javascript" src="https://www.dubs.tech/assets/js/vendor/modernizr-2.6.2.custom.min.js"></script>
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="https://www.dubs.tech/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="https://www.dubs.tech/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="https://www.dubs.tech/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://www.dubs.tech/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://www.dubs.tech/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://www.dubs.tech/images/apple-touch-icon-144x144-precomposed.png">
+
+
+
+
+</head>
+
+<body id="post" >
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+
+
+<div class="header-menu header-menu-top">
+    <ul class="header-item-container">
+      <li class="header-item-title header-toggle "><a href="#menu"><h2><i class="fa fa-bars"></i></h2></a></li>
+      <li class="header-item-title">
+        <a href="https://www.dubs.tech/">
+          
+            <img class="logo" src="https://www.dubs.tech/images/logo.png" alt="dubs·tech">
+          
+          <a href="https://www.dubs.tech/" class="title"> dubs·tech</a>
+        </a>
+      </li>
+      
+        
+        
+
+        
+          <li class="header-item "><a href="https://www.dubs.tech/categories"><h3>Categories</h3></a>
+            <ul class="header-submenu">
+              
+                
+                  <li class="sub-item"><a href="https://www.dubs.tech/categories/#blog">blog</a></li>
+              
+                
+                  <li class="sub-item"><a href="https://www.dubs.tech/categories/#guides">guides</a></li>
+              
+            </ul>
+          </li>
+        
+      
+        
+        
+
+        
+            
+                <li class="header-item "><a href="https://www.dubs.tech/tags"><h3>Tags</h3></a></li>
+            
+        
+      
+        
+        
+
+        
+            
+                <li class="header-item "><a href="https://www.dubs.tech/"><h3>Home</h3></a></li>
+            
+        
+      
+      <li class="header-item"><a href="https://www.dubs.tech/search"><h3><i class="fa fa-search"></i></h3></a></li>
+    </ul>
+  </div>
+<div class="entry-header">
+  <div class="header-title">
+    <div class="header-title-wrap">
+      <h1>Benchmarking ND4J and Neanderthal – Part 2</h1>
+      
+        <h2><span class="entry-date date published updated"><time datetime="2018-06-29T12:12:55+02:00">June 29, 2018</time></span></h2>
+      
+
+      
+        <p class="entry-reading-time">
+          <i class="fa fa-clock-o"></i>
+          
+          Reading time ~6 minutes
+        </p><!-- /.entry-reading-time -->
+      
+    </div><!-- /.header-title-wrap -->
+  </div><!-- /.header-title -->
+</div><!-- /.entry-header -->
+
+
+<nav id="menu" style="display: none">
+  <ul>
+    
+      
+        <li><a href="https://www.dubs.tech/"><h3>Home</h3></a></li>
+      
+    
+      
+        <li><a href="https://www.dubs.tech/tags"><h3>Tags</h3></a></li>
+      
+    
+      
+        <li><a href="https://www.dubs.tech/categories"><h3>Categories</h3></a>
+          <ul>
+            
+              
+                <li><a href="https://www.dubs.tech/categories/#blog">blog</a></li>
+            
+              
+                <li><a href="https://www.dubs.tech/categories/#guides">guides</a></li>
+            
+          </ul>
+        </li>
+      
+    
+  </ul>
+</nav>
+
+<div id="main" role="main">
+  <article class="hentry">
+    <div class="entry-content">
+        
+      <h1 class="post-title entry-title">Benchmarking ND4J and Neanderthal – Part 2</h1>
+      <p>Dragan Djuric, the creator of Neanderthal, has conducted <a href="https://dragan.rocks/articles/18/Neanderthal-vs-ND4J-vol2">another series of benchmarks comparing ND4J and Neanderthal</a>. This time the operation under test is a chain of matrix multiplications.</p>
+
+<p>He claims that in one of the benchmarks Neanderthal is 1000 times faster. This piqued my interest again since those kinds of differences don’t magically show up – especially not in a library as widely used as ND4J.</p>
+
+<p>In this post I investigate the source of this difference, show why it happens and what to do about it as a user of the library.</p>
+
+<p>This is a follow up post to <a href="https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/">Benchmarking ND4J and Neanderthal</a>, so for some more context read that post as well.</p>
+
+<!--more-->
+
+<h1 id="comparing-apples-and-pomelos">Comparing Apples and Pomelos</h1>
+
+<p>ND4J does not have a dedicated <code class="highlighter-rouge">mm</code> method like Neanderthal since chaining matrix multiplications can be easily achieved by chaining multiple <code class="highlighter-rouge">mmul</code> calls. That is also what Dragan did while trying to simulate <code class="highlighter-rouge">mm</code> for his benchmark. The following code snippet shows how he implemented it for his benchmark.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">bench-nd4j-mmul</span><span class="w"> </span><span class="p">[</span><span class="n">m</span><span class="w"> </span><span class="n">k1</span><span class="w"> </span><span class="n">k2</span><span class="w"> </span><span class="n">k3</span><span class="w"> </span><span class="n">k4</span><span class="w"> </span><span class="n">k5</span><span class="w"> </span><span class="n">n</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="nf">with-release</span><span class="w"> </span><span class="p">[</span><span class="n">m1</span><span class="w"> </span><span class="p">(</span><span class="nf">Nd4j/rand</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k1</span><span class="p">)</span><span class="w">
+                 </span><span class="n">m2</span><span class="w"> </span><span class="p">(</span><span class="nf">Nd4j/rand</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k1</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k2</span><span class="p">)</span><span class="w">
+                 </span><span class="n">m3</span><span class="w"> </span><span class="p">(</span><span class="nf">Nd4j/rand</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k2</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k3</span><span class="p">)</span><span class="w">
+                 </span><span class="n">m4</span><span class="w"> </span><span class="p">(</span><span class="nf">Nd4j/rand</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k3</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k4</span><span class="p">)</span><span class="w">
+                 </span><span class="n">m5</span><span class="w"> </span><span class="p">(</span><span class="nf">Nd4j/rand</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k4</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k5</span><span class="p">)</span><span class="w">
+                 </span><span class="n">m6</span><span class="w"> </span><span class="p">(</span><span class="nf">Nd4j/rand</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k5</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">n</span><span class="p">)]</span><span class="w">
+    </span><span class="p">(</span><span class="nf">quick-bench</span><span class="w">
+     </span><span class="p">(</span><span class="nf">do</span><span class="w"> </span><span class="p">(</span><span class="nf">.mmul</span><span class="w"> </span><span class="o">^</span><span class="n">INDArray</span><span class="w"> </span><span class="n">m1</span><span class="w">
+                </span><span class="p">(</span><span class="nf">.mmul</span><span class="w"> </span><span class="o">^</span><span class="n">INDArray</span><span class="w"> </span><span class="n">m2</span><span class="w">
+                       </span><span class="p">(</span><span class="nf">.mmul</span><span class="w"> </span><span class="o">^</span><span class="n">INDArray</span><span class="w"> </span><span class="n">m3</span><span class="w">
+                              </span><span class="p">(</span><span class="nf">.mmul</span><span class="w"> </span><span class="o">^</span><span class="n">INDArray</span><span class="w"> </span><span class="n">m4</span><span class="w">
+                                     </span><span class="p">(</span><span class="nf">.mmul</span><span class="w"> </span><span class="o">^</span><span class="n">INDArray</span><span class="w"> </span><span class="n">m5</span><span class="w"> </span><span class="o">^</span><span class="n">INDArray</span><span class="w"> </span><span class="n">m6</span><span class="p">))</span><span class="w"> </span><span class="p">)))</span><span class="w">
+         </span><span class="n">true</span><span class="p">))))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Translated to Java this invocation would look like this:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">m1</span><span class="o">.</span><span class="na">mmul</span><span class="o">(</span><span class="n">m2</span><span class="o">.</span><span class="na">mmul</span><span class="o">(</span><span class="n">m3</span><span class="o">.</span><span class="na">mmul</span><span class="o">(</span><span class="n">m4</span><span class="o">.</span><span class="na">mmul</span><span class="o">(</span><span class="n">m5</span><span class="o">.</span><span class="na">mmul</span><span class="o">(</span><span class="n">m6</span><span class="o">)))))</span>
+</code></pre></div></div>
+
+<p>This kind of invocation will result in the computation going backwards, as if you literally had set the parenthesis in the multiplication like this: <code class="highlighter-rouge">M = A(B(C(D(EF))))</code>.</p>
+
+<p>Normally you wouldn’t do it like that. Instead it would probably look like this:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">m1</span><span class="o">.</span><span class="na">mmul</span><span class="o">(</span><span class="n">m2</span><span class="o">).</span><span class="na">mmul</span><span class="o">(</span><span class="n">m3</span><span class="o">).</span><span class="na">mmul</span><span class="o">(</span><span class="n">m4</span><span class="o">).</span><span class="na">mmul</span><span class="o">(</span><span class="n">m5</span><span class="o">).</span><span class="na">mmul</span><span class="o">(</span><span class="n">m6</span><span class="o">)</span>
+</code></pre></div></div>
+<p>This second way of doing things is like setting the parenthesis for the multiplication like this: <code class="highlighter-rouge">M = ((((AB)C)D)E)F</code>.</p>
+
+<p>The big difference between those two ways is how the temporary results are computed. Both ways of setting parenthesis are allowed since matrix multiplication is associative. Both of them arrive at the same result, but the matrix sizes at each different step may differ widely.</p>
+
+<h2 id="1000x-difference">1000x difference?</h2>
+
+<p>Dragan has found Neanderthal to be 80 times and 1000 times faster in his non-uniform size benchmarks. Given what we now know about his implementation, and how it would be normally done, lets take a look how the differences play out.</p>
+
+<p>In the following examination, I am using these matrix shapes, as they are what Dragan used in his benchmarks:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>A: 13x13456
+B: 13456x2300
+C: 2300x125
+D: 125x7700
+E: 7700x810
+F: 810x100000
+</code></pre></div></div>
+
+<p>During the calculation of <code class="highlighter-rouge">M = A(B(C(D(EF))))</code>, i.e. the way Dragan implemented it, the computation carries through the column size of the last matrix.</p>
+
+<table rules="groups">
+  <thead>
+    <tr>
+      <th style="text-align: left">Computation Step</th>
+      <th style="text-align: right">Result shape</th>
+      <th style="text-align: right">Required operations</th>
+      <th style="text-align: right">Size of result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">EF</td>
+      <td style="text-align: right">7700x100000</td>
+      <td style="text-align: right">1246 GFLOP</td>
+      <td style="text-align: right">2937 MB</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">D(EF)</td>
+      <td style="text-align: right">125x100000</td>
+      <td style="text-align: right">192 GFLOP</td>
+      <td style="text-align: right">47 MB</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">C(D(EF))</td>
+      <td style="text-align: right">2300x100000</td>
+      <td style="text-align: right">3565 GFLOP</td>
+      <td style="text-align: right">877 MB</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">B(C(D(EF)))</td>
+      <td style="text-align: right">13456x100000</td>
+      <td style="text-align: right">6188 GFLOP</td>
+      <td style="text-align: right">5133 MB</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">A(B(C(D(EF))))</td>
+      <td style="text-align: right">13x100000</td>
+      <td style="text-align: right">34 GFLOP</td>
+      <td style="text-align: right">4,95 MB</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Now, lets take a look at how the more common usage would look like, i.e. using <code class="highlighter-rouge">M = ((((AB)C)D)E)F</code></p>
+
+<table rules="groups">
+  <thead>
+    <tr>
+      <th style="text-align: left">Computation Step</th>
+      <th style="text-align: right">Result shape</th>
+      <th style="text-align: right">Required operations</th>
+      <th style="text-align: right">Size of result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">AB</td>
+      <td style="text-align: right">13x2300</td>
+      <td style="text-align: right">0,804 GFLOP</td>
+      <td style="text-align: right">0,11 MB</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">(AB)C</td>
+      <td style="text-align: right">13x125</td>
+      <td style="text-align: right">0,007 GFLOP</td>
+      <td style="text-align: right">0,006 MB</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">((AB)C)D</td>
+      <td style="text-align: right">13x7700</td>
+      <td style="text-align: right">0,024 GFLOP</td>
+      <td style="text-align: right">0,38 MB</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">(((AB)C)D)E</td>
+      <td style="text-align: right">13x810</td>
+      <td style="text-align: right">0,162 GFLOP</td>
+      <td style="text-align: right">0,04 MB</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">((((AB)C)D)E)F)</td>
+      <td style="text-align: right">13x100000</td>
+      <td style="text-align: right">851,877 GFLOP</td>
+      <td style="text-align: right">4,95 MB</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>As you can see, this way of structuring the order of the computation results with the number of rows of the first matrix being carried through the computation. The end result is still the same.</p>
+
+<p>The difference in the required number of floating point operations to perform the actual computation is enormous. The first way requires a total of 11225 GFLOP, while the second one requires only about 853 GFLOP, with pretty much all the time spent on just the last multiplication.</p>
+
+<p>Just the order of those operations results already in a huge difference, but there is even more to it. Once you take into consideration that each matrix at each step is also not just large, but absolutely enormous when compared to each other, you see how caching efficiency and memory access costs will dwarf even the huge difference in required operations.</p>
+
+<h1 id="comparing-apples-to-apples-again">Comparing apples to apples again</h1>
+
+<p>Let’s use Clojure threading macro to both, make the benchmark easier to read, and turn into more of an apples to apples comparison:</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="k">defn</span><span class="w"> </span><span class="n">bench-nd4j-mmul</span><span class="w"> </span><span class="p">[</span><span class="n">m</span><span class="w"> </span><span class="n">k1</span><span class="w"> </span><span class="n">k2</span><span class="w"> </span><span class="n">k3</span><span class="w"> </span><span class="n">k4</span><span class="w"> </span><span class="n">k5</span><span class="w"> </span><span class="n">n</span><span class="p">]</span><span class="w">
+  </span><span class="p">(</span><span class="nf">with-release</span><span class="w"> </span><span class="p">[</span><span class="n">m1</span><span class="w"> </span><span class="p">(</span><span class="nf">Nd4j/rand</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k1</span><span class="p">)</span><span class="w">
+                 </span><span class="n">m2</span><span class="w"> </span><span class="p">(</span><span class="nf">Nd4j/rand</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k1</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k2</span><span class="p">)</span><span class="w">
+                 </span><span class="n">m3</span><span class="w"> </span><span class="p">(</span><span class="nf">Nd4j/rand</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k2</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k3</span><span class="p">)</span><span class="w">
+                 </span><span class="n">m4</span><span class="w"> </span><span class="p">(</span><span class="nf">Nd4j/rand</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k3</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k4</span><span class="p">)</span><span class="w">
+                 </span><span class="n">m5</span><span class="w"> </span><span class="p">(</span><span class="nf">Nd4j/rand</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k4</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k5</span><span class="p">)</span><span class="w">
+                 </span><span class="n">m6</span><span class="w"> </span><span class="p">(</span><span class="nf">Nd4j/rand</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">k5</span><span class="w"> </span><span class="o">^</span><span class="nb">int</span><span class="w"> </span><span class="n">n</span><span class="p">)]</span><span class="w">
+                </span><span class="p">(</span><span class="nf">quick-bench</span><span class="w">
+                  </span><span class="p">(</span><span class="nf">do</span><span class="w"> </span><span class="p">(</span><span class="nb">-&gt;</span><span class="w"> </span><span class="o">^</span><span class="n">INDArray</span><span class="w"> </span><span class="n">m1</span><span class="w">
+                          </span><span class="p">(</span><span class="nf">.mmul</span><span class="w"> </span><span class="o">^</span><span class="n">INDArray</span><span class="w"> </span><span class="n">m2</span><span class="p">)</span><span class="w">
+                          </span><span class="p">(</span><span class="nf">.mmul</span><span class="w"> </span><span class="o">^</span><span class="n">INDArray</span><span class="w"> </span><span class="n">m3</span><span class="p">)</span><span class="w">
+                          </span><span class="p">(</span><span class="nf">.mmul</span><span class="w"> </span><span class="o">^</span><span class="n">INDArray</span><span class="w"> </span><span class="n">m4</span><span class="p">)</span><span class="w">
+                          </span><span class="p">(</span><span class="nf">.mmul</span><span class="w"> </span><span class="o">^</span><span class="n">INDArray</span><span class="w"> </span><span class="n">m5</span><span class="p">)</span><span class="w">
+                          </span><span class="p">(</span><span class="nf">.mmul</span><span class="w"> </span><span class="o">^</span><span class="n">INDArray</span><span class="w"> </span><span class="n">m6</span><span class="p">))</span><span class="w">
+                      </span><span class="n">true</span><span class="p">))))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>And now the results aren’t as far away from each other as they were in Dragan’s benchmark.</p>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nf">bench-nd4j-mmul</span><span class="w"> </span><span class="mi">13</span><span class="w"> </span><span class="mi">13456</span><span class="w"> </span><span class="mi">2300</span><span class="w"> </span><span class="mi">125</span><span class="w"> </span><span class="mi">7700</span><span class="w"> </span><span class="mi">810</span><span class="w"> </span><span class="mi">100000</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Evaluation count : 18 in 6 samples of 3 calls.
+             Execution time mean : 46,150162 ms
+    Execution time std-deviation : 5,780911 ms
+   Execution time lower quantile : 39,230463 ms ( 2,5%)
+   Execution time upper quantile : 52,629633 ms (97,5%)
+                   Overhead used : 1,397597 ns
+</code></pre></div></div>
+
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="nf">bench-neanderthal-mm</span><span class="w"> </span><span class="mi">13</span><span class="w"> </span><span class="mi">13456</span><span class="w"> </span><span class="mi">2300</span><span class="w"> </span><span class="mi">125</span><span class="w"> </span><span class="mi">7700</span><span class="w"> </span><span class="mi">810</span><span class="w"> </span><span class="mi">100000</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Evaluation count : 24 in 6 samples of 4 calls.
+             Execution time mean : 26,642012 ms
+    Execution time std-deviation : 1,391461 ms
+   Execution time lower quantile : 24,798310 ms ( 2,5%)
+   Execution time upper quantile : 27,893699 ms (97,5%)
+                   Overhead used : 1,397597 ns
+</code></pre></div></div>
+
+<p>As you can see: it is still pretty much the same 2x difference that he found for uniform sizes. Or in his own words:</p>
+
+<blockquote>
+  <p>Not something to write the blog post about.</p>
+</blockquote>
+
+<h1 id="repeating-the-benchmarks">Repeating the benchmarks</h1>
+
+<p>I have again added those benchmarks to <a href="https://github.com/treo/benchmarking_nd4j">my own JMH benchmark suite</a> and included some micro optimizations for the case when all matrices are uniformly sized and I’ve added a chained gemm invocation for good measure.</p>
+
+<p>It shows that, on the current ND4J SNAPSHOT, the performance of <code class="highlighter-rouge">mmul</code> and <code class="highlighter-rouge">gemm</code> is pretty much equal. Since I didn’t run into an odd behavior of criterium (the benchmarking library used in Dragan’s benchmark) this time and my JMH benchmark results were pretty close to those shown above, I’m not adding another table of numbers here.</p>
+
+<p>I’ve <a href="TODO">created another pull request for Neanderthal</a> so its benchmarks can reflect the differences that I’ve found here as well.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>Benchmarking is hard. Fair benchmarking is even harder. Again, the difference turns out to be not as large as originally claimed. Since ND4J doesn’t have a specialized <code class="highlighter-rouge">mm</code> call that takes any number of matrices, you will, also again, have to understand what you are actually doing when composing matrix multiplications in order to get the most performance out of ND4J.</p>
+
+<p>This is even more apparent when you consider other matrix size constellations. Change the benchmark to start with 100000 and end with 13 and you will get the large difference again – since now it would be better to use the way Dragan implemented it originally. Neanderthal’s <code class="highlighter-rouge">mm</code> call includes an order optimization step, which given any number of matrices will decide up front in which order those matrices should be multiplied.</p>
+
+<p>The biggest user of ND4J is Deeplearning4J, and this kind of chain matrix multiplications aren’t required there.  And since no one else has asked for this functionality yet, no one has cared to implement a specialized method like that. This results in a situation where it is easy to create a benchmark that will show huge differences.</p>
+
+<p>I’m personally not a huge fan of the “you are holding it wrong” type of argument, so I’m pretty impressed by what Neanderthal does to make cases like this work out of the box. In addition to this I’d actually say that even a 2x difference is something to write a blog post about. Especially since this gives us yet another benchmark that we can use to improve ND4J’s speed up out of the box.</p>
+
+<p>Just like the last time, I am glad that Dragan created his benchmarks and published his numbers, as they show us where additional functionality and documentation is missing, and how we can improve ND4J even further.</p>
+
+      <footer class="entry-meta">
+        <span class="entry-tags"><a href="https://www.dubs.tech/tags#nd4j" title="Pages tagged nd4j" class="tag"><span class="term">nd4j</span></a><a href="https://www.dubs.tech/tags#benchmarks" title="Pages tagged benchmarks" class="tag"><span class="term">benchmarks</span></a></span>
+        
+        <span class="author vcard"><span class="fn">Paul Dubs</span></span>
+        <div class="social-share">
+  <ul class="socialcount socialcount-small inline-list">
+    <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal-2/" title="Share on Facebook"><span class="count"><i class="fa fa-facebook-square"></i> Like</span></a></li>
+    <li class="twitter"><a href="https://twitter.com/intent/tweet?text=https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal-2/" title="Share on Twitter"><span class="count"><i class="fa fa-twitter-square"></i> Tweet</span></a></li>
+    <li class="googleplus"><a href="https://plus.google.com/share?url=https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal-2/" title="Share on Google Plus"><span class="count"><i class="fa fa-google-plus-square"></i> +1</span></a></li>
+  </ul>
+</div><!-- /.social-share -->
+
+      </footer>
+    </div><!-- /.entry-content -->
+    <div class="read-more">
+  <div class="read-more-header">
+    <a href="/about" class="read-more-btn">About the Author</a>
+  </div><!-- /.read-more-header -->
+  <div class="read-more-content author-info">
+    <h3>Paul Dubs</h3>
+    <div class="author-container">
+      <img class="author-img" src="https://www.dubs.tech/images/avatar.jpg" alt="Paul Dubs" />
+      <div class="author-bio">Professional software developer for over 12 years. Passionate about creating maintainable solutions and helping people to learn.</div>
+    </div>
+    <div class="author-share">
+      <ul class="list-inline social-buttons">
+        
+          <li><a href="https://github.com/treo" target="_blank"><i class="fa fa-github fa-fw"></i></a></li>
+        
+          <li><a href="https://www.linkedin.com/in/paul-dubs" target="_blank"><i class="fa fa-linkedin fa-fw"></i></a></li>
+        
+      </ul>
+      
+        <a aria-label="Follow @treo on GitHub" data-style="mega" href="https://github.com/treo" class="github-button">Follow @treo</a>
+      
+      <br>
+      
+        <a href="https://twitter.com/dot_treo" class="twitter-follow-button" data-show-count="false" data-size="large">Follow @dot_treo</a>
+      
+    </div>
+  </div>
+</div>
+
+    
+    <div class="read-more">
+  
+    <div class="read-more-header">
+      <a href="https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/" class="read-more-btn">Read More</a>
+    </div><!-- /.read-more-header -->
+    <div class="read-more-content">
+      <h3><a href="https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/" title="Benchmarking ND4J and Neanderthal">Benchmarking ND4J and Neanderthal</a></h3>
+      <p>Comparing the overhead of the two fastest matrix math libraries on the JVM. <a href="https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/">Continue reading</a></p>
+    </div><!-- /.read-more-content -->
+  
+  <div class="read-more-list">
+    
+      <div class="list-item">
+        <h4><a href="https://www.dubs.tech/blog/game-of-life-apl-nd4j-samediff/" title="Implementing Conway’s Game of Life with Tensor Math">Implementing Conway’s Game of Life with Tensor Math</a></h4>
+        <span>Published on February 23, 2018</span>
+      </div><!-- /.list-item -->
+    
+      <div class="list-item">
+        <h4><a href="https://www.dubs.tech/guides/maven-essentials/" title="Maven: Essentials">Maven: Essentials</a></h4>
+        <span>Published on February 05, 2018</span>
+      </div><!-- /.list-item -->
+    
+  </div><!-- /.read-more-list -->
+</div><!-- /.read-more -->
+  </article>
+</div><!-- /#main -->
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">window.jQuery || document.write('<script type="text/javascript" src="https://www.dubs.tech/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script type="text/javascript" src="https://www.dubs.tech/assets/js/scripts.min.js"></script>
+<script type="text/javascript" async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
+<script type="text/javascript">!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+
+
+
+
+
+
+
+
+
+<div class="footer-wrapper">
+  <footer role="contentinfo">
+    <span>&copy; 2018 Paul Dubs.</span>
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+</body>
+</html>

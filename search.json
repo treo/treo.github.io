@@ -1,9 +1,17 @@
 [
   
     {
+      "title"    : "Benchmarking ND4J and Neanderthal – Part 2",
+      "category" : "",
+      "tags"     : "nd4j, benchmarks",
+      "url"      : "https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal-2/",
+      "date"     : "2018-06-29 12:12:55 +0200"
+    } ,
+  
+    {
       "title"    : "Benchmarking ND4J and Neanderthal",
       "category" : "",
-      "tags"     : "nd4j",
+      "tags"     : "nd4j, benchmarks",
       "url"      : "https://www.dubs.tech/blog/benchmarking-nd4j-and-neanderthal/",
       "date"     : "2018-06-26 13:17:10 +0200"
     } ,
