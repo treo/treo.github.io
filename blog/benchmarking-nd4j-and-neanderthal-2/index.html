@@ -218,7 +218,7 @@
 </code></pre></div></div>
 <p>This second way of doing things is like setting the parenthesis for the multiplication like this: <code class="highlighter-rouge">M = ((((AB)C)D)E)F</code>.</p>
 
-<p>The big difference between those two ways is how the temporary results are computed. Both ways of setting parenthesis are allowed since matrix multiplication is associative. Both of them arrive at the same result, but the matrix sizes at each different step may differ widely.</p>
+<p>The big difference between those two ways is how the temporary results are computed. Both ways of setting parenthesis are allowed because matrix multiplication is associative. Both of them arrive at the same result, but the matrix sizes at each different step may differ widely.</p>
 
 <h2 id="1000x-difference">1000x difference?</h2>
 
@@ -330,7 +330,7 @@ F: 810x100000
 
 <p>Just the order of those operations results already in a huge difference, but there is even more to it. Once you take into consideration that each matrix at each step is also not just large, but absolutely enormous when compared to each other, you see how caching efficiency and memory access costs will dwarf even the huge difference in required operations.</p>
 
-<p>So why do we see only a 1000x difference in speed? Looking at the GFLOPs alone it should be over 3500x. The reason is that on large multiplications MKL actually uses multiple cores. And since my machine has 4 cores, as Dragan’s probably does, it goes down to be just a fourth of that plus some overhead.</p>
+<p>So why do we see only a 1000x difference in speed? Looking at the GFLOPs alone it should be over 3500x. The reason is that on large multiplications MKL actually uses multiple cores. As my machine has 4 cores, as Dragan’s probably does, it goes down to be just a fourth of that plus some overhead.</p>
 
 <h1 id="comparing-apples-to-apples-again">Comparing apples to apples again</h1>
 
@@ -391,11 +391,11 @@ F: 810x100000
 
 <h1 id="conclusion">Conclusion</h1>
 
-<p>Benchmarking is hard. Fair benchmarking is even harder. Again, the difference turns out to be not as large as originally claimed. Since ND4J doesn’t have a specialized <code class="highlighter-rouge">mm</code> call that takes any number of matrices, you will, also again, have to understand what you are actually doing when composing matrix multiplications in order to get the most performance out of ND4J.</p>
+<p>Benchmarking is hard. Fair benchmarking is even harder. Again, the difference turns out to be not as large as originally claimed. As ND4J doesn’t have a specialized <code class="highlighter-rouge">mm</code> call that takes any number of matrices, you will, also again, have to understand what you are actually doing when composing matrix multiplications in order to get the most performance out of ND4J.</p>
 
-<p>This is even more apparent when you consider other matrix size constellations. Change the benchmark to start with 100000 and end with 13 and you will get the large difference again – since now it would be better to use the way Dragan implemented it originally. Neanderthal’s <code class="highlighter-rouge">mm</code> call includes an order optimization step, which given any number of matrices will decide up front in which order those matrices should be multiplied.</p>
+<p>This is even more apparent when you consider other matrix size constellations. Change the benchmark to start with 100000 and end with 13 and you will get the large difference again – because now it would be better to use the way Dragan implemented it originally. Neanderthal’s <code class="highlighter-rouge">mm</code> call includes an order optimization step, which given any number of matrices will decide up front in which order those matrices should be multiplied.</p>
 
-<p>The biggest user of ND4J is Deeplearning4J, and this kind of chain matrix multiplications aren’t required there.  And since no one else has asked for this functionality yet, no one has cared to implement a specialized method like that. This results in a situation where it is easy to create a benchmark that will show huge differences.</p>
+<p>The biggest user of ND4J is Deeplearning4J, and this kind of chain matrix multiplications aren’t required there.  And as no one else has asked for this functionality yet, no one has cared to implement a specialized method like that. This results in a situation where it is easy to create a benchmark that will show huge differences.</p>
 
 <p>I’m personally not a huge fan of the “you are holding it wrong” type of argument, so I’m pretty impressed by what Neanderthal does to make cases like this work out of the box. In addition to this I’d actually say that even a 2x difference is something to write a blog post about. Especially since this gives us yet another benchmark that we can use to improve ND4J’s speed up out of the box.</p>
 
