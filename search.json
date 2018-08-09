@@ -1,5 +1,12 @@
 [
   
+    {
+      "title"    : "Quickstart with Deeplearning4J",
+      "category" : "",
+      "tags"     : "dl4j, guide",
+      "url"      : "https://www.dubs.tech/guides/quickstart-with-dl4j/",
+      "date"     : "2018-08-06 11:43:27 +0200"
+    } ,
   
     {
       "title"    : "Benchmarking ND4J and Neanderthal – Part 2",
