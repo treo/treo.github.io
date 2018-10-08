@@ -568,10 +568,10 @@ Confusion matrix format: Actual (rowClass) predicted as (columnClass) N times
 
 <p>Loading the model is as easy as saving it. We specify the file from which the data should be loaded and load the model and any additionally stored data.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>File modelSave = new File("X:/Churn_Modelling/model.bin");
-MultiLayerNetwork model = ModelSerializer.restoreMultiLayerNetwork(modelSave);
-DataAnalysis analysis = DataAnalysis.fromJson(ModelSerializer.getObjectFromFile(modelSave, "dataanalysis"));
-Schema targetSchema = Schema.fromJson(ModelSerializer.getObjectFromFile(modelSave, "schema"));
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">File</span> <span class="n">modelSave</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="s">"X:/Churn_Modelling/model.bin"</span><span class="o">);</span>
+<span class="n">MultiLayerNetwork</span> <span class="n">model</span> <span class="o">=</span> <span class="n">ModelSerializer</span><span class="o">.</span><span class="na">restoreMultiLayerNetwork</span><span class="o">(</span><span class="n">modelSave</span><span class="o">);</span>
+<span class="n">DataAnalysis</span> <span class="n">analysis</span> <span class="o">=</span> <span class="n">DataAnalysis</span><span class="o">.</span><span class="na">fromJson</span><span class="o">(</span><span class="n">ModelSerializer</span><span class="o">.</span><span class="na">getObjectFromFile</span><span class="o">(</span><span class="n">modelSave</span><span class="o">,</span> <span class="s">"dataanalysis"</span><span class="o">));</span>
+<span class="n">Schema</span> <span class="n">targetSchema</span> <span class="o">=</span> <span class="n">Schema</span><span class="o">.</span><span class="na">fromJson</span><span class="o">(</span><span class="n">ModelSerializer</span><span class="o">.</span><span class="na">getObjectFromFile</span><span class="o">(</span><span class="n">modelSave</span><span class="o">,</span> <span class="s">"schema"</span><span class="o">));</span>
 </code></pre></div></div>
 
 <p>We assume that the data will come from a different source than the training data. So, we will not be able to reuse our CSVRecordReader. For this example, we are even going one step further and skip a record reader at all. Rather we will hard code it for the example, but putting a DTO with its getters in place would be just as easy.</p>
@@ -642,7 +642,7 @@ Schema targetSchema = Schema.fromJson(ModelSerializer.getObjectFromFile(modelSav
 
 <h2 id="parallel-inference">Parallel Inference</h2>
 
-<p>Models are not thread safe in DL4J, i.e. they cannot be used by multiple threads simultaneously. However, this can hardly be avoided in the context of web applications, for example. You could provide each thread with its own model, but this would quickly lead to requiring lots of memory, especially with complex models.</p>
+<p>Models are not thread safe in DL4J, i.e. they cannot be used by multiple threads simultaneously (<em>Update:</em> Since 1.0.0-beta2 they are <code class="highlighter-rouge">synchronized</code>  so using them from different threads is possible, but will result in a serial execution). However, this can hardly be avoided in the context of web applications, for example. You could provide each thread with its own model, but this would quickly lead to requiring lots of memory, especially with complex models.</p>
 
 <p>To solve this problem, there is the Parallel Inference module for DL4J, which takes requests from multiple threads, collects them for a short while, and then queries the model for all collected requests. Since the model works in parallel internally, the available resources are still fully utilized.</p>
 
