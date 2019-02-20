@@ -194,10 +194,18 @@ MathJax.Hub.Config({
 
 <p><em>Update 07.11.2018</em>: Version <code class="highlighter-rouge">1.0.0-beta3</code> has been released. I’ll update this post shortly. The model shown here needs to be retuned and the dependency declaration for ParallelInference needs to be updated. In the meantime check out the release notes for <a href="https://deeplearning4j.org/release-notes#onezerozerobeta3">Deeplearning4J 1.0.0-beta3</a>.</p>
 
+<p><em>Update 20.02.2019</em>: Finally came around to updating this to use version <code class="highlighter-rouge">1.0.0-beta3</code>. Changed a few hyper parameters; Added some additional headings for the DataVec section; Updated <a href="https://github.com/treo/quickstart-with-dl4j">companion project</a> with the fixes necessary to run on Java 11.</p>
+
 <ul id="markdown-toc">
   <li><a href="#integrating-dl4j-into-your-project" id="markdown-toc-integrating-dl4j-into-your-project">Integrating DL4J into your project</a></li>
   <li><a href="#loading-data" id="markdown-toc-loading-data">Loading data</a>    <ul>
-      <li><a href="#datavec" id="markdown-toc-datavec">DataVec</a></li>
+      <li><a href="#datavec" id="markdown-toc-datavec">DataVec</a>        <ul>
+          <li><a href="#defining-a-schema" id="markdown-toc-defining-a-schema">Defining a Schema</a></li>
+          <li><a href="#analyzing-the-data" id="markdown-toc-analyzing-the-data">Analyzing the data</a></li>
+          <li><a href="#transformation-and-normalization" id="markdown-toc-transformation-and-normalization">Transformation and Normalization</a></li>
+          <li><a href="#vectorization" id="markdown-toc-vectorization">Vectorization</a></li>
+        </ul>
+      </li>
     </ul>
   </li>
   <li><a href="#training-the-model" id="markdown-toc-training-the-model">Training the model</a>    <ul>
@@ -223,10 +231,10 @@ MathJax.Hub.Config({
 <p>DL4J is not intended to be used without build tools, since it itself has a large number of direct and transitive dependencies. Therefore, there is no single jar file that you could manually specify as a dependency in your IDE.
 DL4J and its libraries have a modular structure so that you can adapt its dependencies to the needs of your project. Especially for beginners this can make getting started a bit more complicated, because it is not necessarily obvious which submodule is needed to make a certain class available.</p>
 
-<p>The used versions of all DL4J modules should always be the same. To simplify version management, we define a property which we will use in the following to specify the version. DL4J is currently close to its 1.0 release and in this post, we are using version 1.0.0-beta2, which has only recently been released.</p>
+<p>The used versions of all DL4J modules should always be the same. To simplify version management, we define a property which we will use in the following to specify the version. DL4J is currently close to its 1.0 release and in this post, we are using version 1.0.0-beta3, which has only recently been released.</p>
 
 <div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;properties&gt;</span>
-    <span class="nt">&lt;dl4j.version&gt;</span>1.0.0-beta2<span class="nt">&lt;/dl4j.version&gt;</span>
+    <span class="nt">&lt;dl4j.version&gt;</span>1.0.0-beta3<span class="nt">&lt;/dl4j.version&gt;</span>
 <span class="nt">&lt;/properties&gt;</span>
 </code></pre></div></div>
 
@@ -250,7 +258,7 @@ DL4J and its libraries have a modular structure so that you can adapt its depend
 
 <p>Both backends rely on the use of native binaries, which is why the platform modules also include the binaries for all supported platforms. This allows distributing an Uberjar to several different platforms without having to create a single specialized jar file for each one of them. The currently supported platforms for the CPU backend are: Linux (PPC64LE, x86_64), Windows (x86_64), macOS (x86_64), Android (ARM, ARM64, x86, x86_64); for CUDA-enabled GPUs: Linux (PPC64LE, x86_64), macOS (x86_64), Windows (x86_64).</p>
 
-<p>Due to the fact that some of DL4J’s own dependencies are not yet fully compatible with newer Java versions, the version used here can only be used with Java 8 at most. However, full compatibility with Java 11 is planned for the upcoming 1.0 release.</p>
+<p>Due to the fact that some of DL4J’s own dependencies are not yet fully compatible with newer Java versions, some workarounds can be required to make it run on Java 9/10/11 (see <a href="https://github.com/treo/quickstart-with-dl4j/blob/86162976fc7d7b74e1df62d0fa1fc32c25ea024b/pom.xml#L66-L79">pom.xml:66-79</a>)</p>
 
 <p>As the last dependency for a basic setup, we add a logger. DL4J requires an SLF4J-API compatible logger to share its information with us. In this example we use Logback Classic.</p>
 
@@ -310,6 +318,8 @@ DL4J and its libraries have a modular structure so that you can adapt its depend
 
 <p>As with the <code class="highlighter-rouge">FileSplit</code>, DataVec also provides different implementations for the <code class="highlighter-rouge">RecordReader</code> interface, like readers for Excel files, pictures, videos or even (via JDBC connected) databases.</p>
 
+<h3 id="defining-a-schema">Defining a Schema</h3>
+
 <p>Records are basically nothing more than lists of values. And especially in the case of the <code class="highlighter-rouge">CSVRecordReader</code>, these values are all strings. In order to continue working with them, we have to define a schema for our data. Similar to the schema you may know from SQL databases, we specify here which types of values can be in a record. Due to the fact that a record is a list of values, we also have to pay attention to the order of the column definitions here, since it must correspond to the order in our CSV files.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Schema</span> <span class="n">schema</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Schema</span><span class="o">.</span><span class="na">Builder</span><span class="o">()</span>
@@ -329,6 +339,8 @@ DL4J and its libraries have a modular structure so that you can adapt its depend
 </code></pre></div></div>
 
 <p>Here it is already worthwhile to know your data at least superficially. For example, we have already specified all possible values for the “Geography” and “Gender” columns in the schema, and we have specified the numbers 0 and 1 for “Has Credit Card”, “Is Active Member” and “Exited” as categorical instead of declaring them as integers. This is because experience has shown that such yes/no information works better as categorical data (with one-hot encoding, see below).</p>
+
+<h3 id="analyzing-the-data">Analyzing the data</h3>
 
 <p>In the next step, we will first have the data analyzed. For this we use a new feature, called <code class="highlighter-rouge">AnalyzeLocal</code>, which is not made available by the <code class="highlighter-rouge">deeplearning4j-core</code> module and therefore requires us to add another dependency.</p>
 
@@ -361,6 +373,8 @@ DL4J and its libraries have a modular structure so that you can adapt its depend
 
 <p>We see that in many cases the value range lies outside the recommended -1 to 1 range. So, we will have to normalize this data before we can continue using it. However, in addition to normalization, there is also further preparatory work to be done.</p>
 
+<h3 id="transformation-and-normalization">Transformation and Normalization</h3>
+
 <p>Here we come to the last step before we can vectorize the data: the TransformProcess. We use it to implement what we have learned from the analysis. We start by removing the columns “Row Number”, “Customer Id” and “Surname”, as these seem useless for the problem and could lead to training problems down the road.</p>
 
 <p>The columns, which we have classified as categorical right from the start, are now transformed into a one-hot encoding. This means that each category gets its own column. Each, but one, of those columns is set to 0. The one column that gets a 1 is exactly the column of the corresponding category. This type of encoding is always useful when you have data that does not have a natural translation into a numerical form and cannot be sorted. In our example it would make no sense to code the countries of the “Geography” column as <code class="highlighter-rouge">0,1,2</code>, since each country could assume any of these values. Instead, the “Geography” column becomes 3 different columns that can be interpreted as “Is in [country]”.</p>
@@ -384,6 +398,8 @@ DL4J and its libraries have a modular structure so that you can adapt its depend
 <p>In choosing the appropriate normalization for the remaining columns, we are guided by the results of the analysis. As a rule of thumb, a <code class="highlighter-rouge">MinMax</code> normalization can be used for equally distributed values; a <code class="highlighter-rouge">Standardize</code> normalization is used for normally distributed values; and logarithmic normalization is often appropriate for values covering a wide range. This rule of thumb gives us the initial step, but in practice you should also consider other normalizations and see if they might work better for your problem. In this example, we are using a logarithmic normalization for the “Credit Score” value, although the data in the analysis shows the typical bell shape of a normal distribution.</p>
 
 <p>Most normalization methods require statistical information about the data set to function. Here, too, the analysis we made earlier helps us. Since the analysis also knows the original schema, the <code class="highlighter-rouge">TransferProcess</code> can access the statistical information directly with the specified column name.</p>
+
+<h3 id="vectorization">Vectorization</h3>
 
 <p>The next step is to vectorize the data. Usually Deep Learning does not consider all training data at every training step, but only a fraction of it. This process is called mini-batching. Every full run through the data is called an epoch. We’d like that for each epoch, the mini-batches consist of different examples, since that helps in training a better model. For this reason, we instantiated the <code class="highlighter-rouge">InputSplit</code> at the beginning together with a <code class="highlighter-rouge">Random</code> object.</p>
 
@@ -419,14 +435,14 @@ DL4J and its libraries have a modular structure so that you can adapt its depend
 
 <p>Finding a good network architecture is a task that relies on experimentation. You have to try many ideas and conduct many experiments to find a really good model. As a guideline you can use the rule of thumb that you should start with simple models, i.e. models with few, narrow layers, and add complexity only slowly. If you can’t overfit your model, i.e. reduce the error to 0, on a fraction of your data, like a single mini-batch, then the model will probably not be able to learn anything, even if you give it more data.</p>
 
-<p>For our example we will use a simple multi-layer model. First, we set a random seed, since model weights will be initialized randomly – in our case using the <code class="highlighter-rouge">XAVIER</code> initialization scheme. Setting a random seed is always recommended, especially if you have not yet fixed a model and its hyperparameters, as otherwise good results could simply happen by chance and these would no longer be reproducible. Next, the <code class="highlighter-rouge">TANH</code> activation function is set as a default for each layer. This is a practical shortcut, that allows us to avoid setting it on each layer individually. The updater used here is Adam with a learning rate of 0.15 and a L2 regularization of 0.00316.</p>
+<p>For our example we will use a simple multi-layer model. First, we set a random seed, since model weights will be initialized randomly – in our case using the <code class="highlighter-rouge">XAVIER</code> initialization scheme. Setting a random seed is always recommended, especially if you have not yet fixed a model and its hyperparameters, as otherwise good results could simply happen by chance and these would no longer be reproducible. Next, the <code class="highlighter-rouge">TANH</code> activation function is set as a default for each layer. This is a practical shortcut, that allows us to avoid setting it on each layer individually. The updater used here is Adam with a learning rate of 0.001 and a L2 regularization of 0.0000316.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="n">MultiLayerConfiguration</span> <span class="n">config</span> <span class="o">=</span> <span class="k">new</span> <span class="n">NeuralNetConfiguration</span><span class="o">.</span><span class="na">Builder</span><span class="o">()</span>
                 <span class="o">.</span><span class="na">seed</span><span class="o">(</span><span class="mh">0xC0FFEE</span><span class="o">)</span>
                 <span class="o">.</span><span class="na">weightInit</span><span class="o">(</span><span class="n">WeightInit</span><span class="o">.</span><span class="na">XAVIER</span><span class="o">)</span>
                 <span class="o">.</span><span class="na">activation</span><span class="o">(</span><span class="n">Activation</span><span class="o">.</span><span class="na">TANH</span><span class="o">)</span>
-                <span class="o">.</span><span class="na">updater</span><span class="o">(</span><span class="k">new</span> <span class="n">Adam</span><span class="o">.</span><span class="na">Builder</span><span class="o">().</span><span class="na">learningRate</span><span class="o">(</span><span class="mf">0.15</span><span class="o">).</span><span class="na">build</span><span class="o">())</span>
-                <span class="o">.</span><span class="na">l2</span><span class="o">(</span><span class="mf">0.00316</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">updater</span><span class="o">(</span><span class="k">new</span> <span class="n">Adam</span><span class="o">.</span><span class="na">Builder</span><span class="o">().</span><span class="na">learningRate</span><span class="o">(</span><span class="mf">0.001</span><span class="o">).</span><span class="na">build</span><span class="o">())</span>
+                <span class="o">.</span><span class="na">l2</span><span class="o">(</span><span class="mf">0.0000316</span><span class="o">)</span>
                 <span class="o">.</span><span class="na">list</span><span class="o">(</span>
                         <span class="k">new</span> <span class="n">DenseLayer</span><span class="o">.</span><span class="na">Builder</span><span class="o">().</span><span class="na">nOut</span><span class="o">(</span><span class="mi">25</span><span class="o">).</span><span class="na">build</span><span class="o">(),</span>
                         <span class="k">new</span> <span class="n">DenseLayer</span><span class="o">.</span><span class="na">Builder</span><span class="o">().</span><span class="na">nOut</span><span class="o">(</span><span class="mi">25</span><span class="o">).</span><span class="na">build</span><span class="o">(),</span>
@@ -447,11 +463,11 @@ DL4J and its libraries have a modular structure so that you can adapt its depend
 
 <h2 id="training">Training</h2>
 
-<p>The actual training is pretty simple compared with the effort that it takes to come up with a good model architecture. We first create a new model from the previously defined configuration, initialize it and then train it using the training set for 100 epochs, i.e. the training set is iterated over 100 times during the training. After some time, the training finishes and the trained model can be used.</p>
+<p>The actual training is pretty simple compared with the effort that it takes to come up with a good model architecture. We first create a new model from the previously defined configuration, initialize it and then train it using the training set for 59 epochs, i.e. the training set is iterated over 59 times during the training. After some time, the training finishes and the trained model can be used.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">MultiLayerNetwork</span> <span class="n">model</span> <span class="o">=</span> <span class="k">new</span> <span class="n">MultiLayerNetwork</span><span class="o">(</span><span class="n">config</span><span class="o">);</span>
 <span class="n">model</span><span class="o">.</span><span class="na">init</span><span class="o">();</span>
-<span class="n">model</span><span class="o">.</span><span class="na">fit</span><span class="o">(</span><span class="n">trainIterator</span><span class="o">,</span> <span class="mi">100</span><span class="o">);</span>
+<span class="n">model</span><span class="o">.</span><span class="na">fit</span><span class="o">(</span><span class="n">trainIterator</span><span class="o">,</span> <span class="mi">59</span><span class="o">);</span>
 </code></pre></div></div>
 
 <p>The actual training always revolves around calling the <code class="highlighter-rouge">fit</code> method. DL4J has several variants to offer. The variant used in the example above accepts a <code class="highlighter-rouge">DataSetIterator</code> and an epoch number. If the epoch number is omitted, data is iterated over exactly once, i.e. the model is trained for one epoch. The last variant is that you iterate through the iterator yourself, and therefore also pass the next mini-batch to the <code class="highlighter-rouge">fit</code> method yourself.</p>
@@ -477,17 +493,18 @@ DL4J and its libraries have a modular structure so that you can adapt its depend
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>========================Evaluation Metrics========================
  # of classes:    2
- Accuracy:        0,8715
- Precision:       0,8233
- Recall:          0,7127
- F1 Score:        0,5724
+ Accuracy:        0,8710
+ Precision:       0,8112
+ Recall:          0,7257
+ F1 Score:        0,5892
 Precision, recall &amp; F1: reported for positive class (class 1 - "1") only
 =========================Confusion Matrix=========================
+
+
     0    1
 -----------
- 1571   54 | 0 = 0
-  203  172 | 1 = 1
-
+ 1557   68 | 0 = 0
+  190  185 | 1 = 1
 Confusion matrix format: Actual (rowClass) predicted as (columnClass) N times
 ==================================================================
 </code></pre></div></div>
@@ -497,7 +514,7 @@ Confusion matrix format: Actual (rowClass) predicted as (columnClass) N times
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"MCC: "</span><span class="o">+</span><span class="n">evaluate</span><span class="o">.</span><span class="na">matthewsCorrelation</span><span class="o">(</span><span class="n">EvaluationAveraging</span><span class="o">.</span><span class="na">Macro</span><span class="o">));</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MCC: 0.5244999138768601
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MCC: 0.530128345214995
 </code></pre></div></div>
 
 <h2 id="tuning">Tuning</h2>
@@ -512,9 +529,9 @@ Confusion matrix format: Actual (rowClass) predicted as (columnClass) N times
 
 <p>Since it outputs the value of the loss function at the given iteration, we want that value to be decreasing.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[main] INFO org.deeplearning4j.optimize.listeners.ScoreIterationListener - Score at iteration 0 is 0.7689166033979987
-[main] INFO org.deeplearning4j.optimize.listeners.ScoreIterationListener - Score at iteration 50 is 0.39512659135263994
-[main] INFO org.deeplearning4j.optimize.listeners.ScoreIterationListener - Score at iteration 100 is 0.379518456922476
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[main] INFO org.deeplearning4j.optimize.listeners.ScoreIterationListener - Score at iteration 0 is 0.6176512682074273
+[main] INFO org.deeplearning4j.optimize.listeners.ScoreIterationListener - Score at iteration 50 is 0.417752781122097
+[main] INFO org.deeplearning4j.optimize.listeners.ScoreIterationListener - Score at iteration 100 is 0.3902740254303334
 </code></pre></div></div>
 
 <p>The <code class="highlighter-rouge">StatsListener</code> is much more complex and is used together with a web interface. In order to use it another dependency is needed. Since the web interface is based on the Play Framework which uses Scala, the Scala version to be used must be specified in the artifact id. If you don’t have any other Scala-using dependencies, you can just use the one given here. At the moment the Scala versions 2.10 and 2.11 are supported.</p>
@@ -533,7 +550,7 @@ Confusion matrix format: Actual (rowClass) predicted as (columnClass) N times
 <span class="n">uiServer</span><span class="o">.</span><span class="na">attach</span><span class="o">(</span><span class="n">statsStorage</span><span class="o">);</span>
 <span class="n">model</span><span class="o">.</span><span class="na">addListeners</span><span class="o">(</span><span class="k">new</span> <span class="n">StatsListener</span><span class="o">(</span><span class="n">statsStorage</span><span class="o">,</span> <span class="mi">50</span><span class="o">));</span>
 
-<span class="n">model</span><span class="o">.</span><span class="na">fit</span><span class="o">(</span><span class="n">trainIterator</span><span class="o">,</span> <span class="mi">100</span><span class="o">);</span>
+<span class="n">model</span><span class="o">.</span><span class="na">fit</span><span class="o">(</span><span class="n">trainIterator</span><span class="o">,</span> <span class="mi">59</span><span class="o">);</span>
 </code></pre></div></div>
 
 <p>The web interface shows a lot of information that can be used to see whether the training is progressing well. A score-graph that tends to fall is particularly important. If it rises, the behavior is called divergent, i.e. the model does not only learn nothing, it becomes increasingly worse. In the screenshot you can see that the score for each mini-batch fluctuates, but still decreases on average, so you should not assume a divergence on the first ascent, but only when there is actually a continuing upward trend.</p>
@@ -548,7 +565,7 @@ Confusion matrix format: Actual (rowClass) predicted as (columnClass) N times
 
 <p>Trying to manually figure out which hyperparameters provide the best training progress and the best result can quickly consume a lot of time. That’s where the next tool comes in: the <a href="https://github.com/deeplearning4j/deeplearning4j/tree/master/arbiter">Arbiter library</a> from DL4J supports an automated search for good hyperparameter combinations. For the advanced user it is definitely worth a look.</p>
 
-<p><strong>Pro tip:</strong> When manually looking for a good L2 regularization value, start out with an order of magnitude value close to $\sqrt \frac{batchSize}{TotalExampleCount \times Epochs}$ , in this example using 100 epochs, this is $0.01 = 10^{-2}$ and start reducing it by orders of magnitude, i.e. go from $10^{-2}$ to $10^{-3}$ to $10^{-4}$ and so on. Once you find something that works, try bisecting the order of magnitude, i.e. go from $10^{-2}$ to $10^{-2.5}$ (= 0.00316…). This is how the value in this example was found.</p>
+<p><strong>Pro tip:</strong> When manually looking for a good L2 regularization value, start out with an order of magnitude value close to $\sqrt \frac{batchSize}{TotalExampleCount \times Epochs}$ , in this example using 100 epochs, this is $0.01 = 10^{-2}$ and start reducing it by orders of magnitude, i.e. go from $10^{-2}$ to $10^{-3}$ to $10^{-4}$ and so on. Once you find something that works, try bisecting the order of magnitude, i.e. go from $10^{-4}$ to $10^{-4.5}$ (= 0.0000316…). This is how the value in this example was found.</p>
 
 <h2 id="saving">Saving</h2>
 
@@ -630,14 +647,14 @@ Confusion matrix format: Actual (rowClass) predicted as (columnClass) N times
 
 <p>If you want to have not only the index of the label, e.g. because you want to see the full result of the model, or because you have not performed a classification, but a regression, you can use the <code class="highlighter-rouge">output</code> method.</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">INDArray</span> <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">output</span><span class="o">(</span><span class="n">data</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span> <span class="c1">// = [[      0,9772,     0,0228]]</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">INDArray</span> <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">output</span><span class="o">(</span><span class="n">data</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span> <span class="c1">// = [[    0.9844,    0.0156]]</span>
 </code></pre></div></div>
 
 <p>Please note, however, that the <code class="highlighter-rouge">output</code> method runs in training mode by default, i.e. regularization methods such as dropout are applied. You have to switch into inference mode by passing a second parameter set to <code class="highlighter-rouge">false</code>. Since the <code class="highlighter-rouge">output</code> method is also based on whole batches, the answer is also given in batch form.</p>
 
 <p>Knowing we only have one result, we can convert the ND4J array into a simple double array using the <code class="highlighter-rouge">toDoubleVector</code> method.</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">double</span><span class="o">[]</span> <span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">output</span><span class="o">(</span><span class="n">data</span><span class="o">,</span> <span class="kc">false</span><span class="o">).</span><span class="na">toDoubleVector</span><span class="o">()</span> <span class="c1">// = [0.9772197604179382, 0.022780194878578186]</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">double</span><span class="o">[]</span> <span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="na">output</span><span class="o">(</span><span class="n">data</span><span class="o">,</span> <span class="kc">false</span><span class="o">).</span><span class="na">toDoubleVector</span><span class="o">()</span> <span class="c1">// = [0.9843524098396301, 0.015647541731595993]</span>
 </code></pre></div></div>
 
 <p>If we had had more than one result, the <code class="highlighter-rouge">toDoubleMatrix</code> method would also be usable to get a double matrix, i.e. a two-dimensional double array.</p>
@@ -652,7 +669,7 @@ Confusion matrix format: Actual (rowClass) predicted as (columnClass) N times
 
 <div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
      <span class="nt">&lt;groupId&gt;</span>org.deeplearning4j<span class="nt">&lt;/groupId&gt;</span>
-     <span class="nt">&lt;artifactId&gt;</span>deeplearning4j-parallel-wrapper_2.10<span class="nt">&lt;/artifactId&gt;</span>
+     <span class="nt">&lt;artifactId&gt;</span>deeplearning4j-parallel-wrapper<span class="nt">&lt;/artifactId&gt;</span>
      <span class="nt">&lt;version&gt;</span>${dl4j.version}<span class="nt">&lt;/version&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
 </code></pre></div></div>
@@ -772,7 +789,7 @@ Confusion matrix format: Actual (rowClass) predicted as (columnClass) N times
 
 <div class="footer-wrapper">
   <footer role="contentinfo">
-    <span>&copy; 2018 Paul Dubs.</span>
+    <span>&copy; 2019 Paul Dubs.</span>
 
   </footer>
 </div><!-- /.footer-wrapper -->
