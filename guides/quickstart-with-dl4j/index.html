@@ -665,7 +665,7 @@ Confusion matrix format: Actual (rowClass) predicted as (columnClass) N times
 
 <p>To solve this problem, there is the Parallel Inference module for DL4J, which takes requests from multiple threads, collects them for a short while, and then queries the model for all collected requests. Since the model works in parallel internally, the available resources are still fully utilized.</p>
 
-<p>The module also requires adding another dependency and uses Scala, like the web interface. So, the preferred Scala version must also be specified in the artifact id.</p>
+<p>The module also requires adding another dependency.</p>
 
 <div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;dependency&gt;</span>
      <span class="nt">&lt;groupId&gt;</span>org.deeplearning4j<span class="nt">&lt;/groupId&gt;</span>
